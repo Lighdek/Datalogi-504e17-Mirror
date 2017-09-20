@@ -14,11 +14,11 @@ def loadImageMatrix(filepath=None, loadedImage=None):
     if filepath is None and loadedImage is None:
         raise ValueError('Please insert either a filepath or a loaded image')
     elif filepath is None:
-        return np.asarray(loadedImage)
+        return np.asarray(loadedImage)[:,:,:3]
     elif loadedImage is None:
         return np.asarray(Image.open(filepath))
     else:  # det er ikke min skyld at denne variable hedder bathmats... pycharm insisted.
-        bathmats = (np.asarray(filepath), np.asarray(loadedImage))
+        bathmats = (np.asarray(filepath)[:,:,:3], np.asarray(loadedImage)[:,:,:3])
         return bathmats
 
 
@@ -40,29 +40,41 @@ def watdo(filepath=None, has_lice=False):
             copyfile(filepath, )
 
 
-def print_picture(images=None,filepath=None):
-    if images is None and filepath is None:
+def convert_to_pygame(image):
+    mode = image.mode
+    size = image.size
+    data = image.tobytes()
+    return pygame.image.fromstring(data,size,mode)
+
+
+def print_picture(loaded_image=None, filepath=None):
+    if loaded_image is None and filepath is None:
         raise ValueError('Please either input a valid picture or filepath')
-    elif images is None:
-        images = Image.open(filepath)
-    elif images and filepath:
-        if Image.OPEN(filepath) != images:
+    elif loaded_image is None:
+        pygame_image_file = pygame.image.load(filepath)
+    elif filepath is None:
+        pygame_image_file = convert_to_pygame(loaded_image)
+    elif loaded_image and filepath:
+        if Image.open(filepath) != loaded_image:
             raise ValueError('Wat are u duin? Enden den ene eller den anden dummy.')
+        else:
+            pygame_image_file = convert_to_pygame(loaded_image)
+
 
     screensize = (1600, 900)
     screen = pygame.display.set_mode(screensize)
+    pygame_image_file = pygame.transform.scale(pygame_image_file, screensize)
 
-    print(images.format)
-    image = pygame.image.load(images)
-    image.transform.scale(image, screensize)
     nigger = (0, 0, 0)
     screen.fill(nigger)
-    screen.blit(image(1, 1))
+
+    screen.blit(pygame_image_file, (1, 1))
     pygame.display.flip()
+
     shouldContinue = True
     waiting = True
 
     while waiting:
         for event in pygame.event.get():
-            if event.typpe == pygame.KEYDOWN:
+            if event.type == pygame.KEYDOWN:
                 waiting = False
