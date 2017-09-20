@@ -1,8 +1,12 @@
-from writeasarray import loadImageMatrix
+from writeasarray import loadImageMatrix,print_picture
+from PIL import Image
 
 
+# print(loadImageMatrix(filepath="whereisstuff.png"))
+img = Image.open("god.jpg")
 
-print(loadImageMatrix(filepath="whereisstuff.png")[:,:,:3])
+print_picture(loaded_image=img)
+
 
 
 
