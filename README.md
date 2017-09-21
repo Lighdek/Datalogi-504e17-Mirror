@@ -8,7 +8,8 @@
 
 
 #### Dependencies
-__Following is a list of dependencies to run this program__
+__*Following is a list of dependencies to run this program*__  
+Please note that these ONLY include shit you have to download on the side....
 <dl>
 
 <dt>pillow</dt>
@@ -21,9 +22,11 @@ __Following is a list of dependencies to run this program__
     <dd><em>pip install pygame</em></dd>
     <dd>pygame, bliver brugt til at tegne billeder og er en nem måde at få events som keydown osv.</dd>
 
+
+
 </dl>
 
 
 
-# pip install pillow && pip install numpy && pip install pygame
+pip install pillow && pip install numpy && pip install pygame
 
