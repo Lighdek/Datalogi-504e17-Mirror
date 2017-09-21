@@ -4,6 +4,7 @@ import os
 from shutil import copyfile
 from PIL import Image, ImageDraw
 import pygame
+import math
 
 
 
@@ -78,3 +79,56 @@ def print_picture(loaded_image=None, filepath=None):
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 waiting = False
+
+
+def combinePics(loaded_imagessss=None, filepathes = None):
+    if loaded_imagessss is None and filepathes is None:
+        raise ValueError('Please either put pictures or filepathess into this function.')
+
+    elif loaded_imagessss is not None and len(loaded_imagessss) is 1 or filepathes is not None and len(filepathes) is 1:
+        raise AmountError('Please insert more than one picture....')
+
+    elif loaded_imagessss is None:
+        pictures = []
+        for filepath in filepathes:
+            pictures.append(Image.open(filepath))
+        __loadPictures(pictures)
+
+    elif filepathes is None:
+        __loadPictures(loaded_imagessss)
+
+
+    else:
+        raise ValueError('Please only send one or the other. I can\'t handle both senpi </3')
+
+
+def __loadPictures(imgs):
+    length = len(imgs)
+    print (length)
+    collum = row = 0
+    size_w, size_h = 500, 300
+    if length <= 5 :
+        divfive = 1
+        bg_s_w = length * size_w
+    else:
+        divfive = math.ceil(length / 5)
+        bg_s_w = 5 * size_w
+
+    background = Image.new('RGBA',(bg_s_w, divfive * size_h),(255, 255, 255, 255))
+
+    while row < divfive:
+        while collum < 5:
+            index = collum + row * 5
+            if index is length :
+                break
+
+            img = imgs[index]
+            img = img.resize((size_w, size_h), Image.LANCZOS)
+            offset = collum * size_w, row * size_h
+            background.paste(img, offset)
+            collum += 1
+
+        collum = 0
+        row += 1
+    print_picture(loaded_image=background)
+
