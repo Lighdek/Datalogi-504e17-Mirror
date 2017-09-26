@@ -24,6 +24,17 @@ __Following is a list of dependencies to run this program__
 </dl>
 
 
+#### Liste over nummerplader der skal findes:
+__Following is a list of licenceplate shitz__
 
-# pip install pillow && pip install numpy && pip install pygame
+<dl>
+    <dt> 1. Normal (sort / hvid) </dt>
+    <dt>2. Arbejd/Normal (Sort / hvid / gul)</dt>
+    <dt>3. Arbejde (Gul / sort)</dt>
+    <dt>4. Anhænger (Hvid / Rød)</dt>
+    <dt>5. Veteran (Sort / hvid)</dt>
+    <dt>6. Custom nummerplade (hvid / sort (ord))</dt>
+    <dt>7. Små nummerplader (dem der sidder i en af siderne af bilen og ser helt fladmast ud)</dt>
+    <dt>8. Dunno hvis der er flere</dt>
+
 
