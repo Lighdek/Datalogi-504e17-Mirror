@@ -30,48 +30,47 @@ __Following is a list of licenceplate shitz__
 <dl>
     <dt> 1. Normal (sort / hvid) </dt>
         <dd>
-            Inline-style: 
             <img src="http://nummerplade.dk/grafik/nummerplade.png" alt="Normal">
         </dd>
     <dt>2. Arbejd/Normal (Sort / hvid / gul)</dt>
         <dd>
-            ![alt text](http://denstoredanske.dk/@api/deki/files/69609/=EU_serie_75%252c_Papeg%25c3%25b8jeplade.JPG "Delvis arbejds")
+           <img src="http://denstoredanske.dk/@api/deki/files/69609/=EU_serie_75%252c_Papeg%25c3%25b8jeplade.JPG" alt="Delvis arbejds">
         </dd>
     <dt>3. Arbejde (Gul / sort)</dt>
         <dd>
-            ![alt text](http://denstoredanske.dk/@api/deki/files/69605/=EU_serie_66%252c_Varebil.jpg "Arbejds")
+            <img src="http://denstoredanske.dk/@api/deki/files/69605/=EU_serie_66%252c_Varebil.jpg" alt="Arbejds">
         </dd>
     <dt>4. Anhænger (Hvid / Rød)</dt>
         <dd>
-            ![alt text](https://jeanjensen.dk/wp-content/uploads/2013/05/rc-nummerplader-anhaenger-eu-dk-gul.jpg "Anhænger 1")
+            <img src="https://jeanjensen.dk/wp-content/uploads/2013/05/rc-nummerplader-anhaenger-eu-dk-gul.jpg" alt="Anhænger 1">
         </dd>
         <dd>
-            ![alt text](http://www.cykelstart.dk/wp-content/uploads/Atera-Strada-Sport_E-Bike-MTB-1050x700.jpg "Anhænger 2")
+            <img src="http://www.cykelstart.dk/wp-content/uploads/Atera-Strada-Sport_E-Bike-MTB-1050x700.jpg" alt="Anhænger 2">
         </dd>
     <dt>5. Veteran (Sort / hvid)</dt>
         <dd>
-            ![alt text](https://scontent-sea1-1.cdninstagram.com/t51.2885-15/s480x480/e15/10953659_757105714373130_1689055211_n.jpg?ig_cache_key=OTA3MzMwNzA3NTA0NTIxNDI3.2 "Veteran 1")
+            <img src="https://scontent-sea1-1.cdninstagram.com/t51.2885-15/s480x480/e15/10953659_757105714373130_1689055211_n.jpg?ig_cache_key=OTA3MzMwNzA3NTA0NTIxNDI3.2" alt="Veteran 1">
         </dd>
         <dd>
-            ![alt text](https://scontent-sea1-1.cdninstagram.com/t51.2885-15/s480x480/e15/11008227_1575744106025894_1764920202_n.jpg?ig_cache_key=OTQyMDU0Nzg3NTg2MDQzNzU3.2 "Veteran 2")
+            <img src="https://scontent-sea1-1.cdninstagram.com/t51.2885-15/s480x480/e15/11008227_1575744106025894_1764920202_n.jpg?ig_cache_key=OTQyMDU0Nzg3NTg2MDQzNzU3.2" alt="Veteran 2">
         </dd>
     <dt>6. Custom nummerplade (hvid / sort (ord))</dt>
         <dd>
-            ![alt text](https://scontent-sea1-1.cdninstagram.com/t51.2885-15/s750x750/sh0.08/e35/15338315_100140193818741_8252636666917814272_n.jpg?ig_cache_key=MTQwNTM0NzY1MjUzOTA1NzMzNg%3D%3D.2&se=6 "Custom 1")
+            <img src="https://scontent-sea1-1.cdninstagram.com/t51.2885-15/s750x750/sh0.08/e35/15338315_100140193818741_8252636666917814272_n.jpg?ig_cache_key=MTQwNTM0NzY1MjUzOTA1NzMzNg%3D%3D.2&se=6" alt="Custom 1")
         </dd>
         <dd>
-            ![alt text](https://scontent-sea1-1.cdninstagram.com/t51.2885-15/s480x480/e15/10919090_1392264544407690_1759221181_n.jpg?ig_cache_key=ODkwNTA5MjgwMjU0NDM3OTg5.2 "Custom 2")
+            <img src="https://scontent-sea1-1.cdninstagram.com/t51.2885-15/s480x480/e15/10919090_1392264544407690_1759221181_n.jpg?ig_cache_key=ODkwNTA5MjgwMjU0NDM3OTg5.2" alt="Custom 2">
         </dd>
         <dd>
-            ![alt text](http://ekstrabladet.dk/migration_catalog/article3947002.ece/IMAGE_ALTERNATES/relationBig_910/LED_4x2 "Custom 3")
+            <img src="http://ekstrabladet.dk/migration_catalog/article3947002.ece/IMAGE_ALTERNATES/relationBig_910/LED_4x2" alt="Custom 3">
         </dd>
     <dt>7. Små nummerplader (dem der sidder i en af siderne af bilen og ser helt fladmast ud)</dt>
         <dd>
-            ![alt text](https://upload.wikimedia.org/wikipedia/commons/1/18/Kfz-Kennzeichen_THW.jpg "Kunne ikke finde et dansk eksampel")
+            <img src="https://upload.wikimedia.org/wikipedia/commons/1/18/Kfz-Kennzeichen_THW.jpg" alt="Kunne ikke finde et dansk eksampel">
         </dd>
     <dt>8. Dunno hvis der er flere</dt>
         <dd>
-            ![alt text](https://www.denfri.dk/wp-content/uploads/2012/09/bombe-i-en-turban1-585x731.jpg "For en god ordens skyld")
+            <img src="https://www.denfri.dk/wp-content/uploads/2012/09/bombe-i-en-turban1-585x731.jpg" alt="For en god ordens skyld">
         </dd>
 
 
