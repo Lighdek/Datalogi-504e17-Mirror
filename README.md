@@ -31,7 +31,7 @@ __Following is a list of licenceplate shitz__
     <dt> 1. Normal (sort / hvid) </dt>
         <dd>
             Inline-style: 
-            ![alt text](http://nummerplade.dk/grafik/nummerplade.png "Normal")
+            <img src="http://nummerplade.dk/grafik/nummerplade.png" alt="Normal">
         </dd>
     <dt>2. Arbejd/Normal (Sort / hvid / gul)</dt>
         <dd>
