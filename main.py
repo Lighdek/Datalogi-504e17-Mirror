@@ -1,6 +1,14 @@
 from help_functions import loadImageMatrix,print_picture,combinePics
 from PIL import Image
+from Generator import *
 
+
+
+filepaths = ["TestFolder/Backgrounds", "TestFolder/WithLicence","TestFolder/WithoutLicence"]
+dir = generator(filepaths,tbgenerated=20).items()
+
+for pictures in dir:
+    print_picture(loaded_image=pictures[1][0])
 
 
 
@@ -21,9 +29,11 @@ pathes = [img1,img2,img3,img4,img5,img6,img7,img8,img9,img10]
 
 
 # print_picture(loaded_image=img)
-img = []
-for i in pathes:
-    img.append(Image.open(i))
+# img = []
+# for i in pathes:
+#     img.append(Image.open(i))
+
+
 
 
 
