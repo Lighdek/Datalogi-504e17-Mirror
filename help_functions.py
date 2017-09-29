@@ -2,7 +2,7 @@ from PIL import Image, ImageDraw
 import numpy as np
 import os
 from shutil import copyfile
-from PIL import Image, ImageDraw
+from PIL import Image
 import pygame
 import math
 
@@ -38,7 +38,7 @@ def watdo(filepath=None, has_lice=False):
                 if cur_fil_nr > tot_fil_nr:
                     tot_fil_nr = cur_fil_nr
 
-            copyfile(filepath, )
+            copyfile(filepath)
 
 
 def convert_to_pygame(image):
@@ -52,10 +52,10 @@ def print_picture(loaded_image=None, filepath=None):
     if loaded_image is None and filepath is None:
         raise ValueError('Please either input a valid picture or filepath')
     elif loaded_image is None:
-        pygame_image_file = pygame.image.load(filepath)
+        pygame_image_file = pygame.image.load_basic(filepath)
     elif filepath is None:
         pygame_image_file = convert_to_pygame(loaded_image)
-    elif loaded_image and filepath:
+    else:
         if Image.open(filepath) != loaded_image:
             raise ValueError('Wat are u duin? Enden den ene eller den anden dummy.')
         else:
@@ -86,7 +86,7 @@ def combinePics(loaded_imagessss=None, filepathes = None):
         raise ValueError('Please either put pictures or filepathess into this function.')
 
     elif loaded_imagessss is not None and len(loaded_imagessss) is 1 or filepathes is not None and len(filepathes) is 1:
-        raise AmountError('Please insert more than one picture....')
+        raise ValueError('Please insert more than one picture....')
 
     elif loaded_imagessss is None:
         pictures = []
@@ -115,7 +115,7 @@ def __loadPictures(imgs):
         bg_s_w = 5 * size_w
 
     background = Image.new('RGBA',(bg_s_w, divfive * size_h),(255, 255, 255, 255))
-
+    print(background.size)
     while row < divfive:
         while collum < 5:
             index = collum + row * 5
