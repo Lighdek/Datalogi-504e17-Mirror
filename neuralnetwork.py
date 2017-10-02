@@ -26,12 +26,12 @@ class Filter:
         raise NotImplementedError()
 
 
-class FullyConectedFilter(Filter):
+class FullyConnectedFilter(Filter):
 
     matrix = None
 
     def apply(self, layer: NeuralLayer):
-        layer.matrix.dot(self.matrix)
+        return layer.matrix.dot(self.matrix)
 
 
 class ConvolutionalFilter(Filter):
