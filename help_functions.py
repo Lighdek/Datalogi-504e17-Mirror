@@ -11,17 +11,21 @@ import math
 # Man kan enden give den en filepath til et billed eller et allerede loaded billed,
 # eller begge dele, den vil så endten returnere en matrice eller flere.
 
-def loadImageMatrix(filepath=None, loadedImage=None):
+def loadImageMatrix(filepath=None, loadedImage=None, Alpha=False):
     if filepath is None and loadedImage is None:
         raise ValueError('Please insert either a filepath or a loaded image')
     elif filepath is None:
-        return np.asarray(loadedImage)[:,:,:3]
+        in_the_end = np.asarray(loadedImage)
     elif loadedImage is None:
-        return np.asarray(Image.open(filepath))
+        in_the_end = np.asarray(Image.open(filepath))
     else:  # det er ikke min skyld at denne variable hedder bathmats... pycharm insisted.
         bathmats = (np.asarray(filepath)[:,:,:3], np.asarray(loadedImage)[:,:,:3])
         return bathmats
 
+    if not Alpha:
+        in_the_end = in_the_end[:,:,:3]
+
+    return np.array(in_the_end)
 
 def watdo(filepath=None, has_lice=False):
     if filepath is None:

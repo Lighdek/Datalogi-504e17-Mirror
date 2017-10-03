@@ -1,14 +1,17 @@
 from help_functions import loadImageMatrix,print_picture,combinePics
 from PIL import Image
 from Generator import *
+from BlurManipulation import bluring_start
+import itertools
+import time
 
 
-
-filepaths = ["TestFolder/Backgrounds", "TestFolder/WithLicence","TestFolder/WithoutLicence"]
-dir = generator(filepaths,tbgenerated=20).items()
-
-for pictures in dir:
-    print_picture(loaded_image=pictures[1][0])
+#
+# filepaths = ["TestFolder/Backgrounds", "TestFolder/WithLicence","TestFolder/WithoutLicence"]
+# dir = generator(filepaths,tbgenerated=20).items()
+#
+# for pictures in dir:
+#     print_picture(loaded_image=pictures[1][0])
 
 
 
@@ -22,7 +25,8 @@ img7 = "picz/XVII_The_Star.jpg"
 img8 = "picz/XVIII_The_Moon.jpg"
 img9 = "picz/god_emperor.jpg"
 img10 = "picz/whereisstuff.png"
-pathes = [img1,img2,img3,img4,img5,img6,img7,img8,img9,img10]
+img11 = "TestFolder/Backgrounds/CUENCA-1-790x527.jpg"
+pathes = [img1,img2,img3,img4,img5,img6,img7,img8,img9,img10,img11]
 
 
 # print(loadImageMatrix(filepath="whereisstuff.png"))
@@ -32,18 +36,19 @@ pathes = [img1,img2,img3,img4,img5,img6,img7,img8,img9,img10]
 # img = []
 # for i in pathes:
 #     img.append(Image.open(i))
+for x in range(0,10):
+    print_picture(loaded_image=bluring_start(Image.open(img11)))
+    time.sleep(2)
 
 
-
-
-
-combinePics(loaded_imagessss=img)
+#
+# combinePics(filepathes=img1)
 # combinePics(filepathes=pathes)
 
 
 def derp():
     print("This is where we code and fuck hookers")
-
+    time.sleep(2)
 
 def main():
     derp()
