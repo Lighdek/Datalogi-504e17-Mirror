@@ -8,7 +8,8 @@
 
 
 #### Dependencies
-__Following is a list of dependencies to run this program__
+__*Following is a list of dependencies to run this program*__  
+Please note that these ONLY include shit you have to download on the side....
 <dl>
 
 <dt>pillow</dt>
@@ -20,6 +21,8 @@ __Following is a list of dependencies to run this program__
 <dt>pygame</dt>
     <dd><em>pip install pygame</em></dd>
     <dd>pygame, bliver brugt til at tegne billeder og er en nem måde at få events som keydown osv.</dd>
+
+
 
 </dl>
 
@@ -73,4 +76,4 @@ __Following is a list of licenceplate shitz__
             <img src="https://www.denfri.dk/wp-content/uploads/2012/09/bombe-i-en-turban1-585x731.jpg" alt="For en god ordens skyld">
         </dd>
 
-
+pip install pillow && pip install numpy && pip install pygame
