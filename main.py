@@ -36,9 +36,6 @@ pathes = [img1,img2,img3,img4,img5,img6,img7,img8,img9,img10,img11]
 # img = []
 # for i in pathes:
 #     img.append(Image.open(i))
-for x in range(0,10):
-    print_picture(loaded_image=bluring_start(Image.open(img11)))
-    time.sleep(2)
 
 
 #
