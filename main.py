@@ -1,4 +1,3 @@
-from writeasarray import loadImageMatrix,print_picture
 from PIL import Image
 from help_functions import loadImageMatrix,print_picture,combinePics
 from PIL import Image
