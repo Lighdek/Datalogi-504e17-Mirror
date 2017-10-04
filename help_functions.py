@@ -7,10 +7,11 @@ import pygame
 import math
 
 
+def clamp(n, smallest, largest): return max(smallest, min(n, largest))
+
 
 # Man kan enden give den en filepath til et billed eller et allerede loaded billed,
 # eller begge dele, den vil så endten returnere en matrice eller flere.
-
 def loadImageMatrix(filepath=None, loadedImage=None, Alpha=False):
     if filepath is None and loadedImage is None:
         raise ValueError('Please insert either a filepath or a loaded image')
