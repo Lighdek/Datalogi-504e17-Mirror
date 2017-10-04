@@ -1,9 +1,8 @@
-from writeasarray import loadImageMatrix,print_picture
 from PIL import Image
 from help_functions import loadImageMatrix,print_picture,combinePics
 from PIL import Image
 from Generator import *
-from BlurManipulation import bluring_start
+from image_effects import bluring_start, circleBlur
 import itertools
 import time
 
@@ -40,7 +39,8 @@ pathes = [img1,img2,img3,img4,img5,img6,img7,img8,img9,img10,img11]
 # for i in pathes:
 #     img.append(Image.open(i))
 for x in range(0,10):
-    print_picture(loaded_image=bluring_start(Image.open(img11)))
+    #print_picture(loaded_image=bluring_start(Image.open(img11)))
+    print_picture(loaded_image=circleBlur(Image.open(img11)))
     time.sleep(2)
 
 

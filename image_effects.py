@@ -1,23 +1,69 @@
 from PIL import Image
 from help_functions import loadImageMatrix
+
 import random
 import math
 import numpy as np
 
-def bluring_start(image_to_be_blured):
+import neuralnetwork
+
+from help_functions import clamp
+
+
+def randomNoise(imageMatrix, magnitude = 10):
+
+    output = np.empty_like(imageMatrix)
+
+    for x, y, z in np.ndenumerate(imageMatrix):
+        output[x, y, z] = clamp(imageMatrix[z, y, x] + random.randint(-magnitude, magnitude)
+                                , 0, 255)
+
+    return output
+
+def circleBlur(imageMatrix, blurRadius = 1, count = 50):
+
+    imageMatrix = loadImageMatrix(loadedImage=imageMatrix, Alpha=False)
+    imageMatrix = np.pad(imageMatrix, ((blurRadius, blurRadius),(blurRadius, blurRadius), 0), 'edge')
+
+
+
+    count = random.randint(0, count)
+    blurRadius = random.randint(1, blurRadius) #TODO: for each?
+    blurMatrix = np.empty((blurRadius*2+1, blurRadius*2+1, 3))
+
+    sx, sy, _ = imageMatrix.shape
+
+    for (x, y, z), v in np.ndenumerate(blurMatrix):
+        #dist = 1 - (math.hypot(x - blurRadius, y - blurRadius)-1) / (blurRadius)
+        #dist = max(0, dist)
+
+        dist = 1 / (1 + 2*blurRadius)**2
+        blurMatrix[x, y, z] = dist
+
+    print(blurMatrix[:,:,0])
+
+    output = np.empty_like(imageMatrix)
+
+    for i in range(0, count):
+
+        for x in range(0, sx):
+            for y in range(0, sy):
+                print("im")
+                print(imageMatrix[1,1])
+                print(imageMatrix[x-blurRadius:x+blurRadius, y-blurRadius:y+blurRadius])
+                print("bm")
+                print(blurMatrix[:,:,0])
+                output[x, y] = imageMatrix[x-blurRadius:x+blurRadius, y-blurRadius:y+blurRadius].dot(blurMatrix)
+
+    return output
+
+
+def bluring_start(image_to_be_blurred):
     pixels = {}
     under_cut = []
     over_cut = []
 
-    picture_matrix = loadImageMatrix(loadedImage=image_to_be_blured,Alpha=False)
-
-    image_size = image_to_be_blured.size
-
-    for y_axis in range(0, len(picture_matrix[:])):
-
-        for x_axis in range(0, len(picture_matrix[y_axis][:])):
-
-            pixels["{},{}".format(x_axis,y_axis)] = Pixel(picture_matrix[y_axis][x_axis][:])
+    picture_matrix = loadImageMatrix(loadedImage=image_to_be_blurred,Alpha=False)
 
     how_many_pix = 0
     for pi in pixels:
