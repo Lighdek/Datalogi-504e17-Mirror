@@ -62,7 +62,7 @@ def circleBlur(imageMatrix, blurRadius = 5, count = 1, colorbug = False):
                     output[y, x, z] = sum
                 #print(sum)
         paddedMatrix = output
-        print_picture(loaded_image=Image.fromarray(np.array(output)))
+        #print_picture(loaded_image=Image.fromarray(np.array(output)))
     return Image.fromarray(np.array(output))
 
 
