@@ -19,14 +19,7 @@ def bluring_start(image_to_be_blured):
 
             pixels["{},{}".format(x_axis,y_axis)] = Pixel(picture_matrix[y_axis][x_axis][:])
 
-    how_many_pix = 0
-    for pi in pixels:
-        if pixels.get(pi) is not type(int):
-            how_many_pix += 1
 
-    print(how_many_pix)
-
-    print(image_size[0] * image_size[1])
 
     for index in range(0,random.randint(0,50)):
         tmpo = random.randint(0, image_size[1] - 1)
@@ -48,7 +41,6 @@ def bluring_start(image_to_be_blured):
             a = 0
             b = 0
             radius_x = __reccurzion__(a, radius_x, image_size[0])
-            rand_y = __reccurzion__(b, rand_y, image_size[1])
 
             lower_end = tmp_coordinats[0] - math.ceil(radius_x /2 )
             higher_end = tmp_coordinats[0] + math.ceil(radius_x/2)
@@ -99,29 +91,16 @@ def bluring_start(image_to_be_blured):
 
 
     new_picture = []
-    for x in range(len(picture_matrix)):
-        new_picture.append(x)
-        new_picture[x] = []
-        for y in range(len(picture_matrix[x])):
-            new_picture[x].append(y)
-            new_picture[x][y] = []
-            new_picture[x][y].append(pixels.get("{},{}".format(y,x)).RGBA)
-
-    # for pix in pixels:
-    #     de_sht = pix.split(",")
-    #     de_sht[0] = int(de_sht[0])
-    #     de_sht[1] = int(de_sht[1])
-    #     # print("ds1: {}, ds2: {}".format(type(de_sht[0]),type(de_sht[1])))
-    #     # print("coordinats: ({}{}), px_rgba({}) - org_rgba({})".format(de_sht[0],de_sht[1],pixels.get(pix).RGBA,picture_matrix[de_sht[0]][de_sht[1]][:]))
-    #     try:
-    #
-    #
-    #         picture_matrix[de_sht[1]][de_sht[2]] = pixels.get(pix).RGBA
-    #     except Exception as e:
-    #         print("Exception: {}\n Was led by trying to force pointer -> ({},{}) | into the matrix... whereas img_max -> ({},{})".format(e,de_sht[0],de_sht[1],image_size[0],image_size[1]))
+    new_picture = np.empty_like(picture_matrix)
+    for y in range(len(picture_matrix[:])):
 
 
-    return Image.fromarray(np.array(new_picture))
+        for x in range(len(picture_matrix[y][:])):
+
+
+            new_picture[y,x] = pixels.get("{},{}".format(x,y)).RGBA
+
+    return Image.fromarray(new_picture)
 
 
 
