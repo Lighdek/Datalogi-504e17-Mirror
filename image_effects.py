@@ -1,5 +1,5 @@
 from PIL import Image
-from help_functions import loadImageMatrix
+from help_functions import loadImageMatrix, print_picture
 
 import random
 import math
@@ -20,42 +20,50 @@ def randomNoise(imageMatrix, magnitude = 10):
 
     return output
 
-def circleBlur(imageMatrix, blurRadius = 1, count = 50):
+def circleBlur(imageMatrix, blurRadius = 5, count = 1, colorbug = False):
 
     imageMatrix = loadImageMatrix(loadedImage=imageMatrix, Alpha=False)
-    imageMatrix = np.pad(imageMatrix, ((blurRadius, blurRadius),(blurRadius, blurRadius), 0), 'edge')
-
-
-
-    count = random.randint(0, count)
-    blurRadius = random.randint(1, blurRadius) #TODO: for each?
-    blurMatrix = np.empty((blurRadius*2+1, blurRadius*2+1, 3))
-
-    sx, sy, _ = imageMatrix.shape
-
-    for (x, y, z), v in np.ndenumerate(blurMatrix):
-        #dist = 1 - (math.hypot(x - blurRadius, y - blurRadius)-1) / (blurRadius)
-        #dist = max(0, dist)
-
-        dist = 1 / (1 + 2*blurRadius)**2
-        blurMatrix[x, y, z] = dist
-
-    print(blurMatrix[:,:,0])
-
+    print(imageMatrix.shape)
     output = np.empty_like(imageMatrix)
 
+    paddedMatrix = np.pad(imageMatrix, ((blurRadius, blurRadius), (blurRadius, blurRadius), (0, 0)), 'edge')
+    print(paddedMatrix.shape)
+
+    count = random.randint(1, count)
+    blurRadius = blurRadius#random.randint(1, blurRadius)  #TODO: for each?
+
+    blurMatrix = np.empty((blurRadius*2+1, blurRadius*2+1, 3))
+    print(blurMatrix.shape)
+
+    for (y, x, z), v in np.ndenumerate(blurMatrix):
+        dist = 1 / (1 + 2*blurRadius)**2  # currently just averaging
+        blurMatrix[y, x, z] = dist
+
     for i in range(0, count):
+        print("i=%i/%i" % (i, count))
 
-        for x in range(0, sx):
-            for y in range(0, sy):
-                print("im")
-                print(imageMatrix[1,1])
-                print(imageMatrix[x-blurRadius:x+blurRadius, y-blurRadius:y+blurRadius])
-                print("bm")
-                print(blurMatrix[:,:,0])
-                output[x, y] = imageMatrix[x-blurRadius:x+blurRadius, y-blurRadius:y+blurRadius].dot(blurMatrix)
+        # TODO: only iterate over circle bounding box
+        for y in range(0, imageMatrix.shape[0]):
+            print("y=%i/%i" % (y, paddedMatrix.shape[0]))
 
-    return output
+            for x in range(0, imageMatrix.shape[1]):
+
+                for z in range(0, paddedMatrix.shape[2]):
+
+                    sum = 0
+                    for yy in range(0, blurMatrix.shape[0]):
+                        for xx in range(0, blurMatrix.shape[1]):
+                            try:
+                                sum += paddedMatrix[y + yy, x + xx, z] * blurMatrix[yy, xx, z]
+                            except IndexError as e:
+                                print(e)
+                                #print(sum)
+
+                    output[y, x, z] = sum
+                #print(sum)
+        paddedMatrix = output
+        print_picture(loaded_image=Image.fromarray(np.array(output)))
+    return Image.fromarray(np.array(output))
 
 
 def bluring_start(image_to_be_blurred):
