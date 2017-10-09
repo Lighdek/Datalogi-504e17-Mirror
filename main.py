@@ -13,7 +13,7 @@ import time
 # for pictures in dir:
 #     print_picture(loaded_image=pictures[1][0])
 
-
+fper = ["TestFolder/Backgrounds","TestFolder/WithLicence","TestFolder/WithoutLicence"]
 
 img1 = "picz/V_The_Hierophant.jpg"
 img2 = "picz/XI_Justice.jpg"
@@ -37,8 +37,15 @@ pathes = [img1,img2,img3,img4,img5,img6,img7,img8,img9,img10,img11]
 # for i in pathes:
 #     img.append(Image.open(i))
 
+bob = generator(filepaths=fper,tbgenerated=30)
+xxx = 0
+for b in bob:
+    generated = bob.get(b)[0]
+    xxx += 1
+    generated.save("Output/{}.png".format(xxx))
 
-#
+
+
 # combinePics(filepathes=img1)
 # combinePics(filepathes=pathes)
 
