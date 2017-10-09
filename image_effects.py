@@ -20,6 +20,37 @@ def randomNoise(imageMatrix, magnitude = 10):
 
     return output
 
+
+def quickBlur(image, weight = 0.15):
+
+    imageMatrix = loadImageMatrix(loadedImage=image, Alpha=False)
+    outputMatrix = np.empty_like(imageMatrix)
+
+    for y in range(imageMatrix.shape[0]):
+
+        accum = imageMatrix[y, 0]
+        for x in range(imageMatrix.shape[1]):
+
+            pixel = imageMatrix[y, x]
+            accum = accum * (1-weight) + pixel * weight
+
+            outputMatrix[y, x] = accum
+
+    imageMatrix = outputMatrix
+
+    for x in range(imageMatrix.shape[1]):
+
+        accum = imageMatrix[0, x]
+        for y in range(imageMatrix.shape[0]):
+
+            pixel = imageMatrix[y, x]
+            accum = accum * (1-weight) + pixel * weight
+
+            outputMatrix[y, x] = accum
+
+    return Image.fromarray(np.array(outputMatrix))
+
+
 def circleBlur(imageMatrix, blurRadius = 5, count = 1, colorbug = False):
 
     imageMatrix = loadImageMatrix(loadedImage=imageMatrix, Alpha=False)
