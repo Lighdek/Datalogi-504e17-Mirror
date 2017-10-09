@@ -130,16 +130,16 @@ def generator(filepaths, tbgenerated=None, lpnl=None):
 
         # Find a forground based on if there is going to be a licenceplate or knot.
         if "licence" == isThereALicence:
-            rawforground = dict_with_pictures.get(aliasForWithLicence[0])[random.randint(0, (aliasForWithLicence[1] - 1))]
+            rawforeground = dict_with_pictures.get(aliasForWithLicence[0])[random.randint(0, (aliasForWithLicence[1] - 1))]
         else:
-            rawforground = dict_with_pictures.get(aliasForWithoutLicence[0])[random.randint(0, (aliasForWithoutLicence[1] - 1))]
+            rawforeground = dict_with_pictures.get(aliasForWithoutLicence[0])[random.randint(0, (aliasForWithoutLicence[1] - 1))]
 
 
         # Start the creation of the new image. This image is going to support alpha (or transparrent
         # And is going to have the same dimentions as the background image.
         newImg = Image.new('RGBA',(background.size[0],background.size[1]),(0,0,0,0))
 
-        foreground = rawforground.getImage()
+        foreground = rawforeground.getImage()
 
 
         # if random.randint(0, 3) != 3 and False:
@@ -184,7 +184,7 @@ def generator(filepaths, tbgenerated=None, lpnl=None):
         # The 1 item in said array contains the image that is the resoult of this fuckshow, the secon is the
         # forground information that we get from the 'DizImage' object
         # And the third item is the background information from the 'DizImage' object
-        feededInfo[count] = [newImg,rawforground,rawbackground]
+        feededInfo[count] = [newImg,rawforeground,rawbackground]
 
         # Incriment and decriment
         count += 1
