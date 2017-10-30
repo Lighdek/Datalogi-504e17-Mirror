@@ -1,6 +1,6 @@
 from help_functions import loadImageMatrix,print_picture,combinePics
 from Generator import *
-from image_effects import bluring_start, circleBlur, quickBlur
+from image_effects import quickBlur
 
 img1 = "picz/V_The_Hierophant.jpg"
 img2 = "picz/XI_Justice.jpg"

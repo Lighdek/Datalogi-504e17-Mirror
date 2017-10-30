@@ -50,7 +50,7 @@ def quickBlur(image, weight = 0.15):
 
     return Image.fromarray(np.array(outputMatrix))
 
-
+#Very slow^tm
 def circleBlur(imageMatrix, blurRadius = 5, count = 1, colorbug = False):
 
     imageMatrix = loadImageMatrix(loadedImage=imageMatrix, Alpha=False)
