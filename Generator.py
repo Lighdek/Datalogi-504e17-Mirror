@@ -130,33 +130,48 @@ def generator(filepaths, tbgenerated=None, lpnl=None):
 
         # Find a forground based on if there is going to be a licenceplate or knot.
         if "licence" == isThereALicence:
-            rawforground = dict_with_pictures.get(aliasForWithLicence[0])[random.randint(0, (aliasForWithLicence[1] - 1))]
+            rawforeground = dict_with_pictures.get(aliasForWithLicence[0])[random.randint(0, (aliasForWithLicence[1] - 1))]
         else:
-            rawforground = dict_with_pictures.get(aliasForWithoutLicence[0])[random.randint(0, (aliasForWithoutLicence[1] - 1))]
+            rawforeground = dict_with_pictures.get(aliasForWithoutLicence[0])[random.randint(0, (aliasForWithoutLicence[1] - 1))]
 
 
         # Start the creation of the new image. This image is going to support alpha (or transparrent
         # And is going to have the same dimentions as the background image.
         newImg = Image.new('RGBA',(background.size[0],background.size[1]),(0,0,0,0))
 
-        foreground = rawforground.getImage()
+        foreground = rawforeground.getImage()
 
+
+        # if random.randint(0, 3) != 3 and False:
+        # Rotate the picture to anything from -40 degrees to 40 degrees. Expand = true is to ensure that
+        # the dimentions of the picture supports the possible change in dimentions from the rotation
+        rotation_int = random.randint(-40, 40)
+        foreground = foreground.rotate(rotation_int, expand=True)
+
+        print("Image: {}\nSize: {}".format(foreground, foreground.size))
         # Som magic about the width of the car.
+
+        min_division = 1.5 - (abs(rotation_int) / 45 * .3)
         carWidth = math.ceil(background.size[0] / random.uniform(1.5, 5.5))
         # Get the precentage change from the width of the car to where it was
+        #print(carWidth)
         wpercent = carWidth / float(foreground.size[0])
+        #print(wpercent)
         # Use this magic to determine the cars height.
         carHeight = math.ceil(int((float(foreground.size[1]) * float(wpercent))))
 
-        foreground = foreground.resize((carWidth, carHeight), Image.ANTIALIAS)
+        foreground = foreground.resize((carWidth,carHeight), Image.ANTIALIAS)
+
         # There will be 1/4 chance that there is not going to happen shit to the picture.
-        if random.randint(0, 3) != 3:
-            # Rotate the picture to anything from -40 degrees to 40 degrees. Expand = true is to ensure that
-            # the dimentions of the picture supports the possible change in dimentions from the rotation
-            foreground = foreground.rotate(random.randint(-40, 40), expand=True)
+
 
         # Calculate what the offset for the forground image is going to be.
         # Based on that we don't want the picture to start in the lower right corner and be cut off
+        # print("Size differentiation between background image and forground image (in that order):\n"
+        #       "X: {} vs {} \n"
+        #       "Y: {} vs {}".format(background.size[0],forground.size[0],background.size[1],forground.size[1]))
+
+
         offset = (random.randint(0, background.size[0] - foreground.size[0]),
                   random.randint(0, background.size[1] - foreground.size[1]))
 
@@ -169,7 +184,7 @@ def generator(filepaths, tbgenerated=None, lpnl=None):
         # The 1 item in said array contains the image that is the resoult of this fuckshow, the secon is the
         # forground information that we get from the 'DizImage' object
         # And the third item is the background information from the 'DizImage' object
-        feededInfo[count] = [newImg,rawforground,rawbackground]
+        feededInfo[count] = [newImg,rawforeground,rawbackground]
 
         # Incriment and decriment
         count += 1
