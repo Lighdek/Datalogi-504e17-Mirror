@@ -2,7 +2,35 @@
 # eller begge dele, den vil så endten returnere en matrice eller flere.
 import numpy as np
 
-from PIL import Image
+
+class Model:
+
+    name = None
+    model = None
+
+    def __init__(self, name: str, model: list) -> None:
+
+        self.name = name
+
+        #if not isinstance(model, list):
+        #    raise ValueError("Model expected list of layers, got %s" % repr(model))
+        for l in model:
+            if not isinstance(l, Layer):
+                raise ValueError("Model list must contain layers, got %s" % repr(l))
+
+        self.model = model
+
+        # TODO: load from file: folder+name+ext
+
+    def train(self, input_):
+
+        output = self.test(input_)
+
+        pass
+
+    def test(self, input_) -> Output:
+        pass
+
 
 class Output:
     """
@@ -14,7 +42,28 @@ class Output:
     def __init__(self, x, y, z):
         matrix = np.empty((x, y, z))
 
+class WeightBiasDelta:
+    """
+    The changes to weights and biases returned from train method
+    Is averaged when updating weights of the model
+    """
+
+    deltaWeight = None
+    deltaBias = None
+
+    def __init__(self) -> None:
+        super().__init__()
+
+
 class Layer:
+
+    def __init__(self, activation = None) -> None:
+        print("Initializing layer of type: %s" % repr(self))
+        if activation is None:
+            print("No activation function set")
+        self.activation = activation
+        super().__init__()
+
     def apply(self, input_: Output):
         raise NotImplementedError()
 
@@ -27,6 +76,7 @@ class FullyConnectedLayer(Layer):
     biases = None
 
     def __init__(self, in_, out_): #,data
+        super().__init__()
         weights = np.empty((in_, out_))
         biases = np.empty((out_,))
 
@@ -39,8 +89,8 @@ class FullyConnectedLayer(Layer):
         # elif isinstance(data, int):
         #     self.matrix
 
-    def apply(self, input_: Output):
-        return input_.matrix.dot(self.matrix)
+    def apply(self, input_: np.ndarray):
+        return self.weights.dot(input_) + self.biases
 
     # TODO: turn below code into class InputLayer
     # @classmethod
@@ -50,9 +100,11 @@ class FullyConnectedLayer(Layer):
     #     else:
     #         return np.asarray(image_or_filepath)[:, :, :3]
 
+
 class ConvolutionalLayer(Layer):
 
-    def __init__(self, filterSize = 5):
+    def __init__(self, filterSize=5):
+        super().__init__()
         self.filterSize = filterSize
 
     def apply(self, input_: Output):
@@ -70,6 +122,7 @@ class ConvolutionalLayer(Layer):
                                    floor(y-filterSize/2):ceil(y+filterSize/2),
                                    floor(x-filterSize/2):ceil(x+filterSize/2)
                                    ].dot(filter)
+
 
 class PoolingLayer(Layer):
     def apply(self, input_: Output):
