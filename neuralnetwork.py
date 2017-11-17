@@ -22,14 +22,27 @@ class Model:
 
         # TODO: load from file: folder+name+ext
 
-    def train(self, input_):
+    def train(self, input_) -> list:  # TODO: list type???
 
-        output = self.test(input_)
+        outputs: list = self.test(input_)
 
-        pass
+        deltas = list()
 
-    def test(self, input_) -> Output:
-        pass
+        for layer in reversed(outputs):
+            # deltas.insert(0, layer.backpropagate()) # TODO: Backprop params
+            pass
+
+        return deltas
+
+    def test(self, input_) -> list:
+
+        outputs = list()
+        outputs.append(input_)
+
+        for layer in self.model:
+            outputs.append(layer.apply(outputs[-1]))
+
+        return outputs
 
 
 class Output:
