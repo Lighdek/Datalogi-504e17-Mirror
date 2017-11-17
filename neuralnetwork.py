@@ -42,6 +42,7 @@ class Output:
     def __init__(self, x, y, z):
         matrix = np.empty((x, y, z))
 
+
 class WeightBiasDelta:
     """
     The changes to weights and biases returned from train method
@@ -67,13 +68,13 @@ class Layer:
     def apply(self, input_: Output):
         raise NotImplementedError()
 
-    def backpropagate(self, output: Output):
+    def backpropagate(self, current: Output, previous: Output):
         raise NotImplementedError()
 
 
 class FullyConnectedLayer(Layer):
-    weights = None
-    biases = None
+    weights: np.ndarray = None
+    biases: np.ndarray = None
 
     def __init__(self, in_, out_): #,data
         super().__init__()
@@ -90,7 +91,18 @@ class FullyConnectedLayer(Layer):
         #     self.matrix
 
     def apply(self, input_: np.ndarray):
+        print(input_.shape)
+        print(input_.shape[0:1])
+        assert len(input_.shape) == input_.ndim
+
+        if input_.ndim > 1 or len(input_) > self.weights.shape[1]:
+            return ValueError("Input shape %s, expected vector of length (%i)"
+                              % (str(input_.shape), self.weights.shape[1]))
+
         return self.weights.dot(input_) + self.biases
+
+    def backpropagate(self, current: Output, previous: Output):
+            pass
 
     # TODO: turn below code into class InputLayer
     # @classmethod
@@ -107,7 +119,7 @@ class ConvolutionalLayer(Layer):
         super().__init__()
         self.filterSize = filterSize
 
-    def apply(self, input_: Output):
+    def apply(self, input_: np.ndarray):
         from math import floor, ceil
 
         filterSize = self.filterSize
@@ -118,7 +130,7 @@ class ConvolutionalLayer(Layer):
         for y in range(1+margin, 1080-margin):
             for y in range(1+margin, 1080-margin):
                 for x in range(1, 1920):
-                    output[y, x] = input_.matrix[
+                    output[y, x] = input_[
                                    floor(y-filterSize/2):ceil(y+filterSize/2),
                                    floor(x-filterSize/2):ceil(x+filterSize/2)
                                    ].dot(filter)
