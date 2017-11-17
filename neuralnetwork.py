@@ -91,28 +91,16 @@ class FullyConnectedLayer(Layer):
 
     def __init__(self, in_, out_): #,data
         super().__init__()
-        weights = np.empty((in_, out_))
-        biases = np.empty((out_,))
-
-
-        # if not isinstance(data, np.ndarray):
-        #     raise TypeError("Herro")
-        # self.matrix = data
-        # if isinstance(data, tuple):
-        #     self.matrix = np.empty(data)
-        # elif isinstance(data, int):
-        #     self.matrix
+        self.weights = np.random.rand(out_, in_)#empty((out_, in_))
+        self.biases = np.empty((out_,))
 
     def apply(self, input_: np.ndarray):
-        print(input_.shape)
-        print(input_.shape[0:1])
         assert len(input_.shape) == input_.ndim
-
         if input_.ndim > 1 or len(input_) > self.weights.shape[1]:
             return ValueError("Input shape %s, expected vector of length (%i)"
                               % (str(input_.shape), self.weights.shape[1]))
 
-        return self.weights.dot(input_) + self.biases
+        return self.activation(self.weights.dot(input_) + self.biases)
 
     def backpropagate(self, current: Output, previous: Output):
             pass
