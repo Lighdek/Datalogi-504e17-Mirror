@@ -1,5 +1,7 @@
 import numpy as np
 import math
+import activation_functions as af
+
 
 class Model:
 
@@ -73,6 +75,7 @@ class Layer:
         print("Initializing layer of type: %s" % repr(self))
         if activation is None:
             print("No activation function set")
+            activation = af.linear
         self.activation = activation
         super().__init__()
 
@@ -95,8 +98,8 @@ class FullyConnectedLayer(Layer):
     def apply(self, input_: np.ndarray):
         assert len(input_.shape) == input_.ndim
         if input_.ndim > 1 or len(input_) > self.weights.shape[1]:
-            return ValueError("Input shape %s, expected vector of length (%i)"
-                              % (str(input_.shape), self.weights.shape[1]))
+            raise ValueError("Input shape %s, expected vector of length (%i)"
+                             % (str(input_.shape), self.weights.shape[1]))
 
         return self.activation(self.weights.dot(input_) + self.biases)
 
@@ -116,33 +119,37 @@ class ConvolutionalLayer(Layer):
 
     stride = None
     kernels = None
-    filter_size = None
+    filterSize = None
     bias = None
 
-    def __init__(self, filterSize,stride,kernels):
+    def __init__(self, filterSize: int, stride: int, kernels: list):
         super().__init__()
 
-        if filterSize < 0:
+        if filterSize <= 0:
             raise ValueError('ConvolutionalLayer filtersize is 0 or less.')
 
         self.filterSize = filterSize
         self.stride = stride
         self.kernels = kernels
-        self.bias = np.random.rand(self.kernels)
+        self.bias = np.random.rand(len(self.kernels))
 
     def apply(self, input_: np.ndarray):
         y_num = input_.shape[0]
         x_num = input_.shape[1]
         num_kernels = len(self.kernels)
 
-        input_ = self.applyZeroPadding(input_, self.filter_size)
-        output = np.empty(shape=(y_num // self. stride, x_num // self.stride, num_kernels)) # make empty shape dependent on stride
+        if input_.shape[2] != self.kernels[0].shape[2]: # TODO: check when loading model
+            raise ValueError("input feature count(%i) does not match Kernel depth(%i) (HAHAHA I er dårlige)"
+                             % (input_.shape[2], self.kernels[0].shape[2]))
+
+        input_ = self.applyZeroPadding(input_, self.filterSize)
+        output = np.empty(shape=(y_num // self.stride, x_num // self.stride, num_kernels)) # make empty shape dependent on stride
 
         for feature in range(0, num_kernels):
             assert (self.kernels[feature].shape[0] % 2) != 0 and (self.kernels[feature].shape[1] % 2) != 0  # Todo exception insted
             for ycounter in range(0, y_num):
                 for xcounter in range(0, x_num):
-                    current_area = input_[ycounter: ycounter + self.filter_size, xcounter: xcounter + self.filter_size]
+                    current_area = input_[ycounter: ycounter + self.filterSize, xcounter: xcounter + self.filterSize]
                     current_kernel = self.kernels[feature]
                     output[ycounter, xcounter, feature] = np.sum(current_area * current_kernel) + self.bias[feature]
 
@@ -176,7 +183,7 @@ class ConvolutionalLayer(Layer):
 class PoolingLayer(Layer):
     stride = None
 
-    def apply(self, input_: Output):
+    def apply(self, input_: np.ndarray):
         y = math.ceil(input_.shape[0] / self.stride)
         x = math.ceil(input_.shape[1] / self.stride)
         z = input_.shape[2]  # feature size
