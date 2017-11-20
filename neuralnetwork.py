@@ -1,5 +1,5 @@
 import numpy as np
-
+import math
 
 class Model:
 
@@ -114,12 +114,46 @@ class FullyConnectedLayer(Layer):
 
 class ConvolutionalLayer(Layer):
 
-    def __init__(self, filterSize=5):
+    stride = None
+    kernels = None
+    filter_size = None
+    bias = None
+
+    def __init__(self, filterSize,stride,kernels):
         super().__init__()
+
+        if filterSize < 0:
+            raise ValueError('ConvolutionalLayer filtersize is 0 or less.')
+
         self.filterSize = filterSize
+        self.stride = stride
+        self.kernels = kernels
+        self.bias = np.random.rand(self.kernels)
 
     def apply(self, input_: np.ndarray):
-        from math import floor, ceil
+        y_num = input_.shape[0]
+        x_num = input_.shape[1]
+        num_kernels = len(self.kernels)
+
+        input_ = self.applyZeroPadding(input_, self.filter_size)
+        output = np.empty(shape=(y_num // self. stride, x_num // self.stride, num_kernels)) # make empty shape dependent on stride
+
+        for feature in range(0, num_kernels):
+            assert (self.kernels[feature].shape[0] % 2) != 0 and (self.kernels[feature].shape[1] % 2) != 0  # Todo exception insted
+            for ycounter in range(0, y_num):
+                for xcounter in range(0, x_num):
+                    current_area = input_[ycounter: ycounter + self.filter_size, xcounter: xcounter + self.filter_size]
+                    current_kernel = self.kernels[feature]
+                    output[ycounter, xcounter, feature] = np.sum(current_area * current_kernel) + self.bias[feature]
+
+        return output
+
+    def applyZeroPadding(self, input_, kernel_size):  # used before input.
+        size = kernel_size // 2
+        # (z) must not be padded. y x z
+        return np.pad(input_, ((size, size), (size, size), (0, 0)), "constant", constant_values=0)
+
+    """from math import floor, ceil
 
         filterSize = self.filterSize
         margin = filterSize // 2  # integer division
@@ -133,11 +167,31 @@ class ConvolutionalLayer(Layer):
                                    floor(y-filterSize/2):ceil(y+filterSize/2),
                                    floor(x-filterSize/2):ceil(x+filterSize/2)
                                    ].dot(filter)
+    """
+
+    def backpropagate(self, current: Output, previous: Output):
+        pass
 
 
 class PoolingLayer(Layer):
+    stride = None
+
     def apply(self, input_: Output):
-        pass
+        y = math.ceil(input_.shape[0] / self.stride)
+        x = math.ceil(input_.shape[1] / self.stride)
+        z = input_.shape[2]  # feature size
+
+        buffer = np.empty(shape=(y, x, z))
+
+        for yc in range(0, y):
+            for xc in range(0, x):
+                for zc in range(0, z):
+                    buffer[yc][xc][zc] = self.maxpool(self.stride, input_, yc * self.stride, xc * self.stride, zc)
+
+    def maxpool(self, stride, input_, x, y, z):
+        buffer = input_[x:x + stride, y:y + stride, z]
+        buffer = buffer.flatten()
+        return np.amax(buffer, axis=0)
 
     def backpropagate(self, input_ : Output, output: Output):
         # Backpropagate to/on highest input
