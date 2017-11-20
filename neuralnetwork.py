@@ -1,5 +1,3 @@
-# Man kan enden give den en filepath til et billed eller et allerede loaded billed,
-# eller begge dele, den vil så endten returnere en matrice eller flere.
 import numpy as np
 
 
@@ -12,7 +10,7 @@ class Model:
 
         self.name = name
 
-        #if not isinstance(model, list):
+        # if not isinstance(model, list):
         #    raise ValueError("Model expected list of layers, got %s" % repr(model))
         for l in model:
             if not isinstance(l, Layer):
@@ -71,7 +69,7 @@ class WeightBiasDelta:
 
 class Layer:
 
-    def __init__(self, activation = None) -> None:
+    def __init__(self, activation=None) -> None:
         print("Initializing layer of type: %s" % repr(self))
         if activation is None:
             print("No activation function set")
