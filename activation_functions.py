@@ -4,6 +4,10 @@ import math
 euler = 2.7182818284590452353602874713527
 
 
+def linear(x):
+    return x
+
+
 def relu(x):
     return max(0, x)
 
