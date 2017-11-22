@@ -179,7 +179,7 @@ def generator(filepaths, tbgenerated=None, lpnl=None):
         newImg.paste(background,(0,0))
         # Paste the forground image at the coordinates (0,0) and make sure that we have alpha
         newImg.paste(foreground,offset,mask=foreground)
-
+        newImg = newImg.resize(512,512)
         # For each itteration append a new item in the dictionary with the itteration number as the key and an array as the value
         # The 1 item in said array contains the image that is the resoult of this fuckshow, the secon is the
         # forground information that we get from the 'DizImage' object
