@@ -87,7 +87,7 @@ def checker():
                          f"dirWithBackgrounds = " + str(dirWithBackgrounds) + "\n"
                          f"dirWithoutLicenceplates = " + str(dirWithoutLicenceplates))
 
-def generator(filepaths, tbgenerated=None, lpnl=None):
+def generator(filepaths, tbgenerated=1, licenseplatePercentage=50):
     # Generator. As this function is the most complicated in this py file. We will descripe everything as goes
 
 
@@ -95,23 +95,19 @@ def generator(filepaths, tbgenerated=None, lpnl=None):
     find_filepaths(filepaths)
 
     # Check if we get parameters as "how many to generate" and "licenceplate per non-licenceplate" ratio
-    if tbgenerated is None:
-        tbgenerated = 1
-    if lpnl is None or lpnl > 100 or lpnl < 1:
-        lpnl = 50
+
+    if licenseplatePercentage >= 1.0 or licenseplatePercentage <= 0.0:
+        raise ValueError("lpnl must be larger than 0 and smaller than 100")
 
     # Check if the folders required is there.
-    try:
-        checker()
-    except Exception:
-        print(Exception)
+    checker()
 
     # Start dir that we are going to return containing the picture + information about the picture.
     feededInfo = {}
 
     count = 0
     # Weighted list, where we calculate how the ratio between cars with licenceplates vs cars without
-    randlst = ['licence'] * lpnl + ['no_licence'] * (100 - lpnl)
+    #randlst = ['licence'] * licenseplatePercentage + ['no_licence'] * (100 - licenseplatePercentage)
 
     # The big while loop that keeps generating pictures untill it is not needed anymore
     # One might think it would be more optimal to ONLY load 1 image pr function call.
@@ -120,27 +116,21 @@ def generator(filepaths, tbgenerated=None, lpnl=None):
     while tbgenerated > 0:
 
         # Rawbackground is the to get the object 'DizImage'.
-        # This is to pass information about the "chocen" background later on.
+        # This is to pass information about the "chosen" background later on.
         rawbackground = dict_with_pictures.get(aliasForBackground[0])[random.randint(0, (aliasForBackground[1] - 1))]
         background = rawbackground.getImage()
 
-
-        # Check if in this picture there is going to be a licenceplate
-        isThereALicence = random.choice(randlst)
-
-        # Find a forground based on if there is going to be a licenceplate or knot.
-        if "licence" == isThereALicence:
-            rawforeground = dict_with_pictures.get(aliasForWithLicence[0])[random.randint(0, (aliasForWithLicence[1] - 1))]
+        # Find a foreground based on if there is going to be a licence plate or knot.
+        if random.random() < licenseplatePercentage:
+            rawForeground = dict_with_pictures.get(aliasForWithLicence[0])[random.randint(0, (aliasForWithLicence[1] - 1))]
         else:
-            rawforeground = dict_with_pictures.get(aliasForWithoutLicence[0])[random.randint(0, (aliasForWithoutLicence[1] - 1))]
-
+            rawForeground = dict_with_pictures.get(aliasForWithoutLicence[0])[random.randint(0, (aliasForWithoutLicence[1] - 1))]
 
         # Start the creation of the new image. This image is going to support alpha (or transparrent
         # And is going to have the same dimentions as the background image.
-        newImg = Image.new('RGBA',(background.size[0],background.size[1]),(0,0,0,0))
+        newImg = Image.new('RGBA', (background.size[0], background.size[1]), (0, 0, 0, 0))
 
-        foreground = rawforeground.getImage()
-
+        foreground = rawForeground.getImage()
 
         # if random.randint(0, 3) != 3 and False:
         # Rotate the picture to anything from -40 degrees to 40 degrees. Expand = true is to ensure that
@@ -160,10 +150,9 @@ def generator(filepaths, tbgenerated=None, lpnl=None):
         # Use this magic to determine the cars height.
         carHeight = math.ceil(int((float(foreground.size[1]) * float(wpercent))))
 
-        foreground = foreground.resize((carWidth,carHeight), Image.ANTIALIAS)
+        foreground = foreground.resize((carWidth, carHeight), Image.ANTIALIAS)
 
         # There will be 1/4 chance that there is not going to happen shit to the picture.
-
 
         # Calculate what the offset for the forground image is going to be.
         # Based on that we don't want the picture to start in the lower right corner and be cut off
@@ -184,7 +173,7 @@ def generator(filepaths, tbgenerated=None, lpnl=None):
         # The 1 item in said array contains the image that is the resoult of this fuckshow, the secon is the
         # forground information that we get from the 'DizImage' object
         # And the third item is the background information from the 'DizImage' object
-        feededInfo[count] = [newImg,rawforeground,rawbackground]
+        feededInfo[count] = [newImg,rawForeground,rawbackground]
 
         # Incriment and decriment
         count += 1
