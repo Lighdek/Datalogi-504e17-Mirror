@@ -1,40 +1,32 @@
-import tensorflow as flow
+import tensorflow as tf
 
-def conv_layer(input_, num_of_inputs, filter_size, num_of_filters, name, stride, distribution):
+def conv_layer(input_tensor, input_depth, filter_size, output_depth, name, strides, stddev):
 
-    with flow.variable_scope(name) as block:
+    with tf.variable_scope(name) as block:
+        matrix_shape = [filter_size, filter_size, input_depth, output_depth]
 
-        # init variables
+        kernels = tf.Variable(tf.truncated_normal(matrix_shape, stddev=stddev), name="kernels")
+        biases = tf.Variable(tf.constant(0.05, shape=(output_depth,)), name="biases")
 
-        # filter size is nxn therfore 2 x filter size
-        matrix_shape = [filter_size, filter_size, num_of_inputs, num_of_filters]
+        layer_tensor = tf.nn.conv2d(input=input_tensor, filter=kernels, strides=strides, padding='VALID') + biases
 
-        weights = flow.Variable(flow.truncated_normal(matrix_shape, stddev=distribution))
-
-        biases = flow.Variable(flow.constant(0.05, shape=[num_of_filters]))
-
-        #init layer
-        layer = flow.nn.conv2d(input=input_, filter=weights, strides=stride, padding='VALID')#same before
-
-        collection = layer + biases
-
-        return collection, weights
+        return layer_tensor
 
 
-def fully_connected_layer(input_, num_of_input, num_of_outputs, name, distribution):
+def fully_connected_layer(input_tensor, num_of_input, num_of_outputs, name, distribution):
 
-    with flow.variable_scope(name) as scope:
-        weights = flow.Variable(flow.truncated_normal([num_of_input, num_of_outputs], stddev=distribution))
-        biases = flow.Variable(flow.constant(0.05, shape=[num_of_outputs])) # why 0.05
+    with tf.variable_scope(name) as scope:
+        weights = tf.Variable(tf.truncated_normal([num_of_input, num_of_outputs], stddev=distribution))
+        biases = tf.Variable(tf.constant(0.05, shape=[num_of_outputs])) # why 0.05
 
-        layer = flow.matmul(input_, weights) + biases # matmul = matrix a * matrix b => a*b and adds bias
+        layer_tensor = tf.matmul(input_tensor, weights) + biases # matmul = matrix a * matrix b => a*b and adds bias
 
-        return layer
+        return layer_tensor
 
 
-def max_pooling_layer(input_, name, stride, ksize):
+def max_pooling_layer(input_tensor, name, stride, ksize):
 
-    with flow.variable_scope(name) as scope:
-        layer = flow.nn.max_pool(value=input_, ksize=ksize, strides=stride, padding='VALID')
-        return layer
+    with tf.variable_scope(name) as scope:
+        layer_tensor = tf.nn.max_pool(value=input_tensor, ksize=ksize, strides=stride, padding='VALID')
+        return layer_tensor
 

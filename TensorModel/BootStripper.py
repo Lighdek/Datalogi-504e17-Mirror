@@ -1,42 +1,30 @@
 import tensorflow as flow
 import time
-import Functions as func
-import Model
+from . import MiscFunctions as func
+from . import JoakimModel
 import collections
 import numpy as np
 
-class Config():
-    num_epochs = 10
-    batch_size = 10
-    stride = [1, 1, 1, 1] # input shape.
-    dist = 0.2
+num_epochs = 10
+batch_size = 10
 
-    # pool
-    k_size = [1, 2, 2, 1]
-    image_size = 28
-    pool_stride = [1, 2, 2, 1]
+learning_rate = 1e-4 # 0.0001
 
-    learning_rate = 1e-4 # 0.0001
-
+# 🚂🚃🚃🚃🚃🚃🚃🚃🚃
 def run():
-    conf = Config()
-    x = flow.placeholder(flow.float32, shape=[None, conf.image_size,conf.image_size, 3], name='X')# Dynamic size
-    x_image = flow.reshape(x, [-1, conf.image_size, conf.image_size, 3])
+    x = flow.placeholder(flow.float32, shape=[None, 28, 28, 3], name='X')# Dynamic size
+    x_image = flow.reshape(x, [-1, 28, 28, 3])
 
     # Placeholder variable for the true labels associated with the images
     y_true = flow.placeholder(flow.float32, shape=[None, 2], name='y_true')
     y_true_cls = flow.argmax(y_true, axis=1)
 
-
-    from tensorflow.examples.tutorials.mnist import input_data #TODO: new data input
-    #data = input_data.read_data_sets('data/MNIST/', one_hot=True) # load data
-
     #make model
-    model = Model.init_model(x_image, conf)
+    model = JoakimModel.init_model(x_image)
 
     cost = func.cost_fucntion(input_=model, y_true=y_true) # calc cost from output.
     #TODO: optimizer skal ske i reduce noden
-    optimizer = func.back_propegate(cost, learning_rate=conf.learning_rate)
+    optimizer = func.back_propegate(cost, learning_rate=learning_rate)
 
     y_pred_cls = func.soft_max(model, 1)  # soft max
 
