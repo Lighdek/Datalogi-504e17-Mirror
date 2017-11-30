@@ -1,6 +1,9 @@
+import numpy as np
 from PIL import Image
 import os
 import random
+
+from help_functions import print_picture
 from image_file import *
 import math
 
@@ -24,7 +27,7 @@ def find_filepaths(filepathes):
     # we load the pictures into the dictionary.
     for filepath in filepathes:
         if not os.path.isdir(filepath):
-            raise ValueError(f"Sorry" + filepath + " filepath does not exsists..")
+            raise ValueError(f"Sorry {filepath} filepath does not exsists.. \ncwd= {os.getcwd()}")
 
         dict_with_pictures[os.path.basename(os.path.normpath(filepath))] = load_pictures(filepath)
 
@@ -82,12 +85,12 @@ def checker():
             aliasForNoLicenceAndBackground.append(len(dict_with_pictures.get(key)))
 
     if not dirWithoutLicenceplates or not dirWithBackgrounds or not dirWithLicencePlates:
-        raise ValueError(f"Sorry you did not provide a dir in one of the following catagories\n"
+        raise ValueError(f"Sorry you did not provide a dir in one of the following categories\n"
                          f"dirWithLicencePlates = " + str(dirWithLicencePlates) + "\n"
                          f"dirWithBackgrounds = " + str(dirWithBackgrounds) + "\n"
-                         f"dirWithoutLicenceplates = " + str(dirWithoutLicenceplates))
+                         f"dirWithoutLicencePlates = " + str(dirWithoutLicenceplates))
 
-def generator(filepaths, tbgenerated=1, licenseplatePercentage=50):
+def generator(filepaths, tbgenerated=1, licenseplatePercentage=0.5):
     # Generator. As this function is the most complicated in this py file. We will descripe everything as goes
 
 
@@ -95,15 +98,15 @@ def generator(filepaths, tbgenerated=1, licenseplatePercentage=50):
     find_filepaths(filepaths)
 
     # Check if we get parameters as "how many to generate" and "licenceplate per non-licenceplate" ratio
-
     if licenseplatePercentage >= 1.0 or licenseplatePercentage <= 0.0:
-        raise ValueError("lpnl must be larger than 0 and smaller than 100")
+        raise ValueError("lpnl must be in range ]0.0, 1.0[")
 
     # Check if the folders required is there.
     checker()
 
     # Start dir that we are going to return containing the picture + information about the picture.
-    feededInfo = {}
+    images = []
+    labels = []
 
     count = 0
     # Weighted list, where we calculate how the ratio between cars with licenceplates vs cars without
@@ -113,36 +116,40 @@ def generator(filepaths, tbgenerated=1, licenseplatePercentage=50):
     # One might think it would be more optimal to ONLY load 1 image pr function call.
     # Yet there is SO many pictures to be loaded, so if we should load and deload everything EVERY time
     # this function is called.. Well.. Shit..
+    print(f"Generating {tbgenerated} images...")
     while tbgenerated > 0:
+
+        progressFrequency = max(10, tbgenerated/100)
+        if tbgenerated % progressFrequency == 0:
+            print(f"-{tbgenerated}")
 
         # Rawbackground is the to get the object 'DizImage'.
         # This is to pass information about the "chosen" background later on.
         rawbackground = dict_with_pictures.get(aliasForBackground[0])[random.randint(0, (aliasForBackground[1] - 1))]
         background = rawbackground.getImage()
 
+        hasLicencePlate = random.random() < licenseplatePercentage
+
         # Find a foreground based on if there is going to be a licence plate or knot.
-        if random.random() < licenseplatePercentage:
+        if hasLicencePlate:
             rawForeground = dict_with_pictures.get(aliasForWithLicence[0])[random.randint(0, (aliasForWithLicence[1] - 1))]
         else:
             rawForeground = dict_with_pictures.get(aliasForWithoutLicence[0])[random.randint(0, (aliasForWithoutLicence[1] - 1))]
 
-        # Start the creation of the new image. This image is going to support alpha (or transparrent
+        # Start the creation of the new image. This image is going to support alpha (or transparency)
         # And is going to have the same dimentions as the background image.
-        newImg = Image.new('RGBA', (background.size[0], background.size[1]), (0, 0, 0, 0))
+        newImg = Image.new('RGB', (background.size[0], background.size[1]), (0, 0, 0, 0))
 
         foreground = rawForeground.getImage()
 
         # if random.randint(0, 3) != 3 and False:
         # Rotate the picture to anything from -40 degrees to 40 degrees. Expand = true is to ensure that
         # the dimentions of the picture supports the possible change in dimentions from the rotation
-        rotation_int = random.randint(-40, 40)
+        rotation_int = random.randint(-20, 20)#(-40, 40)
         foreground = foreground.rotate(rotation_int, expand=True)
 
-        print("Image: {}\nSize: {}".format(foreground, foreground.size))
-        # Som magic about the width of the car.
-
         min_division = 1.5 - (abs(rotation_int) / 45 * .3)
-        carWidth = math.ceil(background.size[0] / random.uniform(1.5, 5.5))
+        carWidth = math.ceil(background.size[0] / random.uniform(1.0, 2.0))#1.5, 5.5))
         # Get the precentage change from the width of the car to where it was
         #print(carWidth)
         wpercent = carWidth / float(foreground.size[0])
@@ -161,22 +168,24 @@ def generator(filepaths, tbgenerated=1, licenseplatePercentage=50):
         #       "Y: {} vs {}".format(background.size[0],forground.size[0],background.size[1],forground.size[1]))
 
 
-        offset = (random.randint(0, background.size[0] - foreground.size[0]),
-                  random.randint(0, background.size[1] - foreground.size[1]))
+        offset = (random.randint(0, max(0, background.size[0] - foreground.size[0])),  # TODO: better idea than just using max?
+                  random.randint(0, max(0, background.size[1] - foreground.size[1])))
 
         # Paste the background at the coordinates (0,0)
         newImg.paste(background,(0,0))
         # Paste the forground image at the coordinates (0,0) and make sure that we have alpha
         newImg.paste(foreground,offset,mask=foreground)
-        newImg = newImg.resize(512,512)
+        newImg = newImg.resize((256, 256))#((256,256))
         # For each itteration append a new item in the dictionary with the itteration number as the key and an array as the value
         # The 1 item in said array contains the image that is the resoult of this fuckshow, the secon is the
         # forground information that we get from the 'DizImage' object
         # And the third item is the background information from the 'DizImage' object
-        feededInfo[count] = [newImg,rawForeground,rawbackground]
 
-        # Incriment and decriment
+        images.append(np.asarray(newImg))
+        labels.append(1 if hasLicencePlate else 0)
+        #print_picture(newImg)
+
         count += 1
         tbgenerated -= 1
 
-    return feededInfo
+    return images, labels
