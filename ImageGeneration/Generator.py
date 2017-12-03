@@ -1,98 +1,70 @@
 from PIL import Image
-import os
+from os import listdir
+from os.path import isdir, join
 import random
 from image_file import *
 import math
-
+from ImageGeneration.licence_plate_inserter import combine_pictures
+from ImageGeneration.pyImgMarker.image_handler import read_from_file
 # The dict with all the pictures in. The key is the foldername,
 # and the value is an array with all pictures in said folder
-dict_with_pictures = {}
+
 
 # In here, we get the name for all the folders, this was originally
 # intended so that it was possible to search the keynames for the folder
 # that resempled the name of the needed folder the most
-aliasForWithLicence = []
-aliasForWithoutLicence = []
-aliasForBackground = []
-aliasForLicenceAndBackground = []
-aliasForNoLicenceAndBackground = []
+images_root = join("ImageGeneration", "Images")
+cars_root = join(images_root, "car")
+cars_l_root = join(images_root, "car_l")
+licence_plate_root = join(images_root, "licence_plates")
+background_root = join(images_root, "backgrounds")
+signs_root = join(images_root, "signs")
 
 
-def find_filepaths(filepathes):
-    # The name says it all, here we get the paths to the folders,
-    # and whilest itterrating over the pictures contained in said folder,
-    # we load the pictures into the dictionary.
-    for filepath in filepathes:
-        if not os.path.isdir(filepath):
-            raise ValueError(f"Sorry" + filepath + " filepath does not exsists..")
+def find_file_paths():
+    return {"cars": listdir(cars_root), "licenceplates": listdir(licence_plate_root),
+            "backgrounds": listdir(background_root), "signs": listdir(signs_root),
+            "cars_l": listdir(cars_l_root).extend(listdir(cars_root))}
 
-        dict_with_pictures[os.path.basename(os.path.normpath(filepath))] = load_pictures(filepath)
+def new_generator(tbgenerated=1, wlicence=50, nolicar=75, nothing=50):
+    feededInfo = {}
+    filepath = find_file_paths()
 
+    if any(v <= 0 or v >= 100 for v in [tbgenerated, wlicence, nolicar, nothing]):
+        raise ValueError("lpnl must be larger than 0.0 and less than 1.0")
 
-def load_pictures(filepath):
-    # Here is where the magic happens. We get a filepath, and then loads the images.
-    # Currently the only supported formats is png, jpg and jpeg.
-    # It also saves the filename (without the format) and stores it as an object of the type "DizImage"
-    # TODO: Change the name of the type "DizImage" to something a bit more appealing
+    for x in range(0, tbgenerated):
+        chosen_bg = filepath["backgrounds"][random.randint(0, len(filepath["backgrounds"]))]
+        background = Image.open(join(background_root, chosen_bg))
 
-    picz = []
-    for pictures in os.listdir(filepath):
+        has_licence_plate = True if random.randint(1, 100) < wlicence else False
+        has_car = True if random.randint(1, 100) < nolicar else False
+        has_nothing = True if random.randint(1, 100) < nothing else False
 
-        if pictures.endswith(".png") or pictures.endswith(".jpg"):
-            picz.append(DizImage(pictures[:-4], Image.open(filepath+"/"+pictures)))
-        elif pictures.endswith(".jpeg"):
-            picz.append(DizImage(pictures[:-5], Image.open(filepath+"/"+pictures)))
-    return picz
+        foreground = {
+            True: filepath["cars_l"][random.randint(0, len(filepath["cars_l"]))],
+            False: {
+                True: filepath["car"][random.randint(0, len(filepath["cars"]))],
+                False: {
+                    True: None,
+                    False: filepath["signs"][random.randint(0, len(filepath["signs"]))]
+                }.get(has_nothing)
+            }.get(has_car)
+        }.get(has_licence_plate)
 
+        if(has_licence_plate):
+            coordinates = get_coordinates(foreground)
 
-def checker():
-    # Checker, checks if there is dictionaries with everything we need.
-    # To generate data that can be used, we need both pictures with:
-    # cars (with and without licenceplate) and backgrounds
-    # Possibly support for background ALREADY with a car that either has licence plate or not
-    dirWithLicencePlates = False
-    dirWithBackgrounds = False
-    dirWithoutLicenceplates = False
-    dirWithBackgroundAndNoLicencePlates = False
-    dirWithBackgroundAndLicencePlates = False
+def get_coordinates(car):
 
-    for key in dict_with_pictures.keys():
-        if "WithLicence" in key:
-
-            dirWithLicencePlates = True
-            aliasForWithLicence.append(key)
-            aliasForWithLicence.append(len(dict_with_pictures.get(key)))
-        elif "Backgrounds" in key:
-
-            dirWithBackgrounds = True
-            aliasForBackground.append(key)
-            aliasForBackground.append(len(dict_with_pictures.get(key)))
-        elif "WithoutLicence" in key:
-
-            dirWithoutLicenceplates = True
-            aliasForWithoutLicence.append(key)
-            aliasForWithoutLicence.append(len(dict_with_pictures.get(key)))
-        elif "BackgroundAndCarWithLicence" in key:
-            dirWithBackgroundAndLicencePlates = True
-            aliasForLicenceAndBackground.append(key)
-            aliasForLicenceAndBackground.append(len(dict_with_pictures.get(key)))
-        elif "BackgroundAndCarWithoutLicence" in key:
-            dirWithBackgroundAndNoLicencePlates = True
-            aliasForNoLicenceAndBackground.append(key)
-            aliasForNoLicenceAndBackground.append(len(dict_with_pictures.get(key)))
-
-    if not dirWithoutLicenceplates or not dirWithBackgrounds or not dirWithLicencePlates:
-        raise ValueError(f"Sorry you did not provide a dir in one of the following catagories\n"
-                         f"dirWithLicencePlates = " + str(dirWithLicencePlates) + "\n"
-                         f"dirWithBackgrounds = " + str(dirWithBackgrounds) + "\n"
-                         f"dirWithoutLicenceplates = " + str(dirWithoutLicenceplates))
+    pass
 
 def generator(filepaths, tbgenerated=1, licenseplatePercentage=50):
     # Generator. As this function is the most complicated in this py file. We will descripe everything as goes
 
 
     #Firstly we find the filepaths
-    find_filepaths(filepaths)
+    find_file_paths(filepaths)
 
     # Check if we get parameters as "how many to generate" and "licenceplate per non-licenceplate" ratio
 
@@ -118,7 +90,7 @@ def generator(filepaths, tbgenerated=1, licenseplatePercentage=50):
         # Rawbackground is the to get the object 'DizImage'.
         # This is to pass information about the "chosen" background later on.
         rawbackground = dict_with_pictures.get(aliasForBackground[0])[random.randint(0, (aliasForBackground[1] - 1))]
-        background = rawbackground.getImage()
+        background = rawbackground.get_image()
 
         # Find a foreground based on if there is going to be a licence plate or knot.
         if random.random() < licenseplatePercentage:
@@ -130,7 +102,7 @@ def generator(filepaths, tbgenerated=1, licenseplatePercentage=50):
         # And is going to have the same dimentions as the background image.
         newImg = Image.new('RGBA', (background.size[0], background.size[1]), (0, 0, 0, 0))
 
-        foreground = rawForeground.getImage()
+        foreground = rawForeground.get_image()
 
         # if random.randint(0, 3) != 3 and False:
         # Rotate the picture to anything from -40 degrees to 40 degrees. Expand = true is to ensure that
