@@ -26,18 +26,16 @@ def main_imgs(file_path, root_folder):
     read_from_file(file_path)
     # Check if there is any pictures.
 
-    if any(isfile(join(root_folder, i)) for i in listdir(root_folder)):
-        print(loaded_imgs)
-        for filename in listdir(root_folder):
-            print(filename)
-            if not filename in loaded_imgs:
-                coordinates = print_pictures(pygame.image.load(join(root_folder, filename)))
-                if coordinates is False:
-                    break
-                loaded_imgs[filename] = coordinates
+    files = listdir(root_folder)
 
-    else:
-        raise ValueError("You need atleast one picture for this to work.")
+    for filename in files:
+        print(filename)
+        if not filename in loaded_imgs:
+            coordinates = print_pictures(pygame.image.load(join(root_folder, filename)))
+            if coordinates is False:
+                break
+            loaded_imgs[filename] = coordinates
+
 
     write_to_file(file_path)
 
