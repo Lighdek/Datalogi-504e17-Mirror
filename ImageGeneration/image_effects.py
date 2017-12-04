@@ -11,7 +11,7 @@ from help_functions import clamp
 
 
 def randomNoise(imageMatrix, magnitude = 10):
-
+    imageMatrix = loadImageMatrix(loadedImage=imageMatrix, Alpha=False)
     output = np.empty_like(imageMatrix)
 
     for x, y, z in np.ndenumerate(imageMatrix):
