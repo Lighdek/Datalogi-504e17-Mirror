@@ -5,9 +5,8 @@ from os.path import join
 
 
 
-image_root = join("ImageGeneration", "Images", "car")
-settings_path = join(image_root, "imgSettings.JSON")
-
+image_root = join("..", "Images", "car")
+settings_path = join("..","Images", "imgSettings.JSON")
 
 try:
     main_imgs(settings_path, image_root)
