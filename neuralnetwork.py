@@ -106,14 +106,6 @@ class FullyConnectedLayer(Layer):
     def backpropagate(self, current: Output, previous: Output):
             pass
 
-    # TODO: turn below code into class InputLayer
-    # @classmethod
-    # def fromImage(cls, image_or_filepath):
-    #     if isinstance(image_or_filepath, str):
-    #         return np.asarray(Image.open(image_or_filepath))
-    #     else:
-    #         return np.asarray(image_or_filepath)[:, :, :3]
-
 
 class ConvolutionalLayer(Layer):
 
