@@ -1,5 +1,4 @@
 from os import listdir
-from picture_class import Picz
 import pygame
 from os.path import isfile, join
 import simplejson as json
