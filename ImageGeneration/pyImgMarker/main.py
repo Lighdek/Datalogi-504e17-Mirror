@@ -1,7 +1,6 @@
 from ImageGeneration.pyImgMarker.image_handler import main_imgs
 from webbrowser import open
 from traceback import print_exc
-import platform
 from os.path import join
 
 
