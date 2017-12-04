@@ -1,4 +1,4 @@
-from image_handler import main_imgs
+from ImageGeneration.pyImgMarker.image_handler import main_imgs
 from webbrowser import open
 from traceback import print_exc
 
