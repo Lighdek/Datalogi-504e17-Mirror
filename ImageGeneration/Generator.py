@@ -1,6 +1,6 @@
 from PIL import Image, ImageFilter
 from os import listdir
-from os.path import isdir, join
+from os.path import join
 import random
 from image_file import *
 import math
@@ -83,6 +83,7 @@ def new_generator(tbgenerated=1, wlicence=50, nolicar=75, nothing=50):
         labels.append(True if has_licence_plate else False)
     return images, labels
 
+
 def get_img(w_l, filepath):
     if w_l:
         v = []
@@ -97,9 +98,11 @@ def get_img(w_l, filepath):
                 v.append(item)
         return v[random.randint(0,len(v))]
 
+
 def get_coordinates(car):
 
     return read_from_file(join(cars_root, "imgSettings.JSON"))[car]
+
 
 def apply_filter(image):
     choice = random.randint(0,2)
