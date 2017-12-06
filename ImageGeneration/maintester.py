@@ -8,7 +8,7 @@ def main(save_root, innerloop, outterloop):
     if not save_root.startswith(".."):
         save_root = os.path.join("..", save_root)
     try:
-        os.makedirs(os.path.join("..", save_root))
+        os.makedirs( save_root)
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise
@@ -31,7 +31,7 @@ def main(save_root, innerloop, outterloop):
 
         for x in range(0, len(images) - 1):
             counter += 1
-            images[x].save(os.path.join("..", save_root, "id:{}_type:{}.png".format(str(counter), labels[x])))
+            images[x].save(os.path.join(save_root, "id:{}_type:{}.png".format(str(counter), labels[x])))
         print(f"Images saved.")
 
 
