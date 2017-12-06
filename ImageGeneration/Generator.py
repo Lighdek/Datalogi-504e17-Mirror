@@ -2,6 +2,7 @@ from PIL import Image, ImageFilter
 from os import listdir
 from os.path import join, dirname,basename
 import random
+from help_functions import loadImageMatrix
 import math
 
 from ImageGeneration.licence_plate_inserter import combine_pictures
@@ -32,8 +33,11 @@ def Generator(tbgenerated=1, wlicence=50, nolicar=75, nothing=50, size=(256,256)
     labels = []
     filepath = find_file_paths()
 
-    if any(v <= 0 or v >= 100 for v in [tbgenerated, wlicence, nolicar, nothing]):
-        raise ValueError("lpnl must be larger than 0.0 and less than 1.0")
+    if any(v <= 0 or v >= 100 for v in [wlicence, nolicar, nothing]):
+        raise ValueError(f"lpnl must be larger than 0 and less than 100"
+                         f"wlicence: {wlicence}"
+                         f"nolicar: {nolicar}"
+                         f"nothing: {nothing}")
 
     for x in range(0, tbgenerated):
         chosen_bg = filepath["backgrounds"][random.randint(0, len(filepath["backgrounds"])- 1)]
@@ -43,7 +47,7 @@ def Generator(tbgenerated=1, wlicence=50, nolicar=75, nothing=50, size=(256,256)
         has_car = True if random.randint(1, 100) < nolicar else False
         has_nothing = True if random.randint(1, 100) < nothing else False
 
-        foreground = {
+        chosen_foreground = {
             True: get_img(True, filepath),
             False: {
                 True: get_img(False, filepath),
@@ -56,10 +60,10 @@ def Generator(tbgenerated=1, wlicence=50, nolicar=75, nothing=50, size=(256,256)
         background = background.resize(size)
 
 
-        if foreground is not None:
+        if chosen_foreground is not None:
             if has_licence_plate:
-                coordinates = get_coordinates(foreground)
-            foreground = Image.open(foreground)
+                coordinates = get_coordinates(chosen_foreground)
+            foreground = Image.open(chosen_foreground)
             if has_licence_plate:
                 foreground = combine_pictures( foreground, coordinates, join(licence_plate_root, filepath["licenceplates"][random.randint(0, len(filepath["licenceplates"]) - 1)]))
 
@@ -76,8 +80,11 @@ def Generator(tbgenerated=1, wlicence=50, nolicar=75, nothing=50, size=(256,256)
 
             offset = (random.randint(0, background.size[0] - foreground.size[0]),
                       random.randint(0, background.size[1] - foreground.size[1]))
-            change_color(foreground, random.random())
-
+            try:
+                foreground = change_color(foreground, random.random())
+            except Exception:
+                print(f"forground_data: {list(foreground.getdata())}")
+                raise
             background.paste(foreground,offset,mask=foreground)
 
         background = apply_filter(background)
