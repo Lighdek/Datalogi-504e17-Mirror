@@ -1,191 +1,117 @@
-import numpy as np
-from PIL import Image
-import os
+from PIL import Image, ImageFilter
+from os import listdir
+from os.path import join, dirname,basename
 import random
-
-from help_functions import print_picture
-from image_file import *
 import math
 
+from ImageGeneration.licence_plate_inserter import combine_pictures
+from ImageGeneration.image_effects import randomNoise, change_color
+from ImageGeneration.pyImgMarker.image_handler import read_from_file
 # The dict with all the pictures in. The key is the foldername,
 # and the value is an array with all pictures in said folder
-dict_with_pictures = {}
+
 
 # In here, we get the name for all the folders, this was originally
 # intended so that it was possible to search the keynames for the folder
 # that resempled the name of the needed folder the most
-aliasForWithLicence = []
-aliasForWithoutLicence = []
-aliasForBackground = []
-aliasForLicenceAndBackground = []
-aliasForNoLicenceAndBackground = []
+
+images_root = join(dirname(__file__), "Images")
+cars_root = join(images_root, "car")
+licence_plate_root = join(images_root, "licence_plates")
+background_root = join(images_root, "backgrounds")
+signs_root = join(images_root, "signs")
 
 
-def find_filepaths(filepathes):
-    # The name says it all, here we get the paths to the folders,
-    # and whilest itterrating over the pictures contained in said folder,
-    # we load the pictures into the dictionary.
-    for filepath in filepathes:
-        if not os.path.isdir(filepath):
-            raise ValueError(f"Sorry {filepath} filepath does not exsists.. \ncwd= {os.getcwd()}")
-
-        dict_with_pictures[os.path.basename(os.path.normpath(filepath))] = load_pictures(filepath)
+def find_file_paths():
+    return {"cars": listdir(cars_root), "licenceplates": listdir(licence_plate_root),
+            "backgrounds": listdir(background_root), "signs": listdir(signs_root)}
 
 
-def load_pictures(filepath):
-    # Here is where the magic happens. We get a filepath, and then loads the images.
-    # Currently the only supported formats is png, jpg and jpeg.
-    # It also saves the filename (without the format) and stores it as an object of the type "DizImage"
-    # TODO: Change the name of the type "DizImage" to something a bit more appealing
-
-    picz = []
-    for pictures in os.listdir(filepath):
-
-        if pictures.endswith(".png") or pictures.endswith(".jpg"):
-            picz.append(DizImage(pictures[:-4], Image.open(filepath+"/"+pictures)))
-        elif pictures.endswith(".jpeg"):
-            picz.append(DizImage(pictures[:-5], Image.open(filepath+"/"+pictures)))
-    return picz
-
-
-def checker():
-    # Checker, checks if there is dictionaries with everything we need.
-    # To generate data that can be used, we need both pictures with:
-    # cars (with and without licenceplate) and backgrounds
-    # Possibly support for background ALREADY with a car that either has licence plate or not
-    dirWithLicencePlates = False
-    dirWithBackgrounds = False
-    dirWithoutLicenceplates = False
-    dirWithBackgroundAndNoLicencePlates = False
-    dirWithBackgroundAndLicencePlates = False
-
-    for key in dict_with_pictures.keys():
-        if "WithLicence" in key:
-
-            dirWithLicencePlates = True
-            aliasForWithLicence.append(key)
-            aliasForWithLicence.append(len(dict_with_pictures.get(key)))
-        elif "Backgrounds" in key:
-
-            dirWithBackgrounds = True
-            aliasForBackground.append(key)
-            aliasForBackground.append(len(dict_with_pictures.get(key)))
-        elif "WithoutLicence" in key:
-
-            dirWithoutLicenceplates = True
-            aliasForWithoutLicence.append(key)
-            aliasForWithoutLicence.append(len(dict_with_pictures.get(key)))
-        elif "BackgroundAndCarWithLicence" in key:
-            dirWithBackgroundAndLicencePlates = True
-            aliasForLicenceAndBackground.append(key)
-            aliasForLicenceAndBackground.append(len(dict_with_pictures.get(key)))
-        elif "BackgroundAndCarWithoutLicence" in key:
-            dirWithBackgroundAndNoLicencePlates = True
-            aliasForNoLicenceAndBackground.append(key)
-            aliasForNoLicenceAndBackground.append(len(dict_with_pictures.get(key)))
-
-    if not dirWithoutLicenceplates or not dirWithBackgrounds or not dirWithLicencePlates:
-        raise ValueError(f"Sorry you did not provide a dir in one of the following categories\n"
-                         f"dirWithLicencePlates = " + str(dirWithLicencePlates) + "\n"
-                         f"dirWithBackgrounds = " + str(dirWithBackgrounds) + "\n"
-                         f"dirWithoutLicencePlates = " + str(dirWithoutLicenceplates))
-
-def generator(filepaths, tbgenerated=1, licenseplatePercentage=0.5):
-    # Generator. As this function is the most complicated in this py file. We will descripe everything as goes
-
-
-    #Firstly we find the filepaths
-    find_filepaths(filepaths)
-
-    # Check if we get parameters as "how many to generate" and "licenceplate per non-licenceplate" ratio
-    if licenseplatePercentage >= 1.0 or licenseplatePercentage <= 0.0:
-        raise ValueError("lpnl must be in range ]0.0, 1.0[")
-
-    # Check if the folders required is there.
-    checker()
-
-    # Start dir that we are going to return containing the picture + information about the picture.
+def Generator(tbgenerated=1, wlicence=50, nolicar=75, nothing=50, size=(256,256)):
     images = []
     labels = []
+    filepath = find_file_paths()
 
-    count = 0
-    # Weighted list, where we calculate how the ratio between cars with licenceplates vs cars without
-    #randlst = ['licence'] * licenseplatePercentage + ['no_licence'] * (100 - licenseplatePercentage)
+    if any(v <= 0 or v >= 100 for v in [tbgenerated, wlicence, nolicar, nothing]):
+        raise ValueError("lpnl must be larger than 0.0 and less than 1.0")
 
-    # The big while loop that keeps generating pictures untill it is not needed anymore
-    # One might think it would be more optimal to ONLY load 1 image pr function call.
-    # Yet there is SO many pictures to be loaded, so if we should load and deload everything EVERY time
-    # this function is called.. Well.. Shit..
-    print(f"Generating {tbgenerated} images...")
-    while tbgenerated > 0:
+    for x in range(0, tbgenerated):
+        chosen_bg = filepath["backgrounds"][random.randint(0, len(filepath["backgrounds"])- 1)]
+        background = Image.open(join(background_root, chosen_bg))
 
-        progressFrequency = max(10, tbgenerated/100)
-        if tbgenerated % progressFrequency == 0:
-            print(f"-{tbgenerated}")
+        has_licence_plate = True if random.randint(1, 100) < wlicence else False
+        has_car = True if random.randint(1, 100) < nolicar else False
+        has_nothing = True if random.randint(1, 100) < nothing else False
 
-        # Rawbackground is the to get the object 'DizImage'.
-        # This is to pass information about the "chosen" background later on.
-        rawbackground = dict_with_pictures.get(aliasForBackground[0])[random.randint(0, (aliasForBackground[1] - 1))]
-        background = rawbackground.getImage()
-
-        hasLicencePlate = random.random() < licenseplatePercentage
-
-        # Find a foreground based on if there is going to be a licence plate or knot.
-        if hasLicencePlate:
-            rawForeground = dict_with_pictures.get(aliasForWithLicence[0])[random.randint(0, (aliasForWithLicence[1] - 1))]
-        else:
-            rawForeground = dict_with_pictures.get(aliasForWithoutLicence[0])[random.randint(0, (aliasForWithoutLicence[1] - 1))]
-
-        # Start the creation of the new image. This image is going to support alpha (or transparency)
-        # And is going to have the same dimentions as the background image.
-        newImg = Image.new('RGB', (background.size[0], background.size[1]), (0, 0, 0, 0))
-
-        foreground = rawForeground.getImage()
-
-        # if random.randint(0, 3) != 3 and False:
-        # Rotate the picture to anything from -40 degrees to 40 degrees. Expand = true is to ensure that
-        # the dimentions of the picture supports the possible change in dimentions from the rotation
-        rotation_int = random.randint(-20, 20)#(-40, 40)
-        foreground = foreground.rotate(rotation_int, expand=True)
-
-        min_division = 1.5 - (abs(rotation_int) / 45 * .3)
-        carWidth = math.ceil(background.size[0] / random.uniform(1.0, 2.0))#1.5, 5.5))
-        # Get the precentage change from the width of the car to where it was
-        #print(carWidth)
-        wpercent = carWidth / float(foreground.size[0])
-        #print(wpercent)
-        # Use this magic to determine the cars height.
-        carHeight = math.ceil(int((float(foreground.size[1]) * float(wpercent))))
-
-        foreground = foreground.resize((carWidth, carHeight), Image.ANTIALIAS)
-
-        # There will be 1/4 chance that there is not going to happen shit to the picture.
-
-        # Calculate what the offset for the forground image is going to be.
-        # Based on that we don't want the picture to start in the lower right corner and be cut off
-        # print("Size differentiation between background image and forground image (in that order):\n"
-        #       "X: {} vs {} \n"
-        #       "Y: {} vs {}".format(background.size[0],forground.size[0],background.size[1],forground.size[1]))
+        foreground = {
+            True: get_img(True, filepath),
+            False: {
+                True: get_img(False, filepath),
+                False: {
+                    True: None,
+                    False: join(signs_root, filepath["signs"][random.randint(0, len(filepath["signs"]) - 1 )])
+                }.get(has_nothing)
+            }.get(has_car)
+        }.get(has_licence_plate)
+        background = background.resize(size)
 
 
-        offset = (random.randint(0, max(0, background.size[0] - foreground.size[0])),  # TODO: better idea than just using max?
-                  random.randint(0, max(0, background.size[1] - foreground.size[1])))
+        if foreground is not None:
+            if has_licence_plate:
+                coordinates = get_coordinates(foreground)
+            foreground = Image.open(foreground)
+            if has_licence_plate:
+                foreground = combine_pictures( foreground, coordinates, join(licence_plate_root, filepath["licenceplates"][random.randint(0, len(filepath["licenceplates"]) - 1)]))
 
-        # Paste the background at the coordinates (0,0)
-        newImg.paste(background,(0,0))
-        # Paste the forground image at the coordinates (0,0) and make sure that we have alpha
-        newImg.paste(foreground,offset,mask=foreground)
-        newImg = newImg.resize((256, 256))#((256,256))
-        # For each itteration append a new item in the dictionary with the itteration number as the key and an array as the value
-        # The 1 item in said array contains the image that is the resoult of this fuckshow, the secon is the
-        # forground information that we get from the 'DizImage' object
-        # And the third item is the background information from the 'DizImage' object
+            scale = min(background.size[0] / random.uniform(1.5, 3) / foreground.size[0],
+                        background.size[1] / random.uniform(1.5, 3) / foreground.size[1])
 
-        images.append(np.asarray(newImg))
-        labels.append(1 if hasLicencePlate else 0)
-        #print_picture(newImg)
+            rotation_int = random.randint(-40, 40)
+            foreground = foreground.rotate(rotation_int, expand=True)
 
-        count += 1
-        tbgenerated -= 1
+            #carWidth = math.ceil(background.size[0] / random.uniform(1.5, 3))
+            #carHeight = math.ceil(int((float(foreground.size[1]) * float(wpercent))))
 
+            foreground = foreground.resize((int(foreground.size[0]*scale), int(foreground.size[1]*scale)), Image.ANTIALIAS)
+
+            offset = (random.randint(0, background.size[0] - foreground.size[0]),
+                      random.randint(0, background.size[1] - foreground.size[1]))
+            change_color(foreground, random.random())
+
+            background.paste(foreground,offset,mask=foreground)
+
+        background = apply_filter(background)
+        images.append(background)
+        labels.append(0 if has_licence_plate else 1 if has_car else 2 if not has_nothing else 3)
     return images, labels
+
+
+def get_img(w_l, filepath):
+    v = []
+    if w_l:
+        for item in filepath["cars"]:
+            if item.startswith("L"):
+                v.append(item)
+
+    else:
+        for item in filepath["cars"]:
+            if not item.startswith("L"):
+                v.append(item)
+
+    return join(cars_root, v[random.randint(0, len(v) - 1)])
+
+
+def get_coordinates(car):
+
+    return read_from_file(join(images_root, "imgSettings.JSON"))[basename(car)]
+
+
+def apply_filter(image):
+    choice = random.randint(0,2)
+    if choice is 0:
+        img = image.filter(ImageFilter.GaussianBlur(radius=(random.randint(1,4))))
+    elif choice is 1:
+        img = randomNoise(image, random.randint(3, 10))
+    else:
+        img = image
+    return img

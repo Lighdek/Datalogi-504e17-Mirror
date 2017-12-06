@@ -1,24 +1,19 @@
 from PIL import Image
-from help_functions import loadImageMatrix, print_picture
-
+from help_functions import loadImageMatrix
+from colorsys import rgb_to_hls, hls_to_rgb
 import random
-import math
 import numpy as np
-
-import neuralnetwork
-
 from help_functions import clamp
 
 
-def randomNoise(imageMatrix, magnitude = 10):
-
+def randomNoise(imageMatrix, magnitude=10 ):
+    imageMatrix = loadImageMatrix(loadedImage=imageMatrix, Alpha=False)
     output = np.empty_like(imageMatrix)
 
-    for x, y, z in np.ndenumerate(imageMatrix):
-        output[x, y, z] = clamp(imageMatrix[z, y, x] + random.randint(-magnitude, magnitude)
-                                , 0, 255)
+    for (x, y, z), v in np.ndenumerate(imageMatrix):
+        output[x, y, z] = clamp(imageMatrix[x, y, z] + random.randint(-magnitude, magnitude), 0, 255)
 
-    return output
+    return Image.fromarray(output)
 
 
 def quickBlur(image, weight = 0.15):
@@ -95,3 +90,44 @@ def circleBlur(imageMatrix, blurRadius = 5, count = 1, colorbug = False):
         paddedMatrix = output
         #print_picture(loaded_image=Image.fromarray(np.array(output)))
     return Image.fromarray(np.array(output))
+
+
+def change_color(image, hue):
+
+    imgdata = list(image.getdata())
+    for i in range(0, len(imgdata)):
+        (h, l, s, a) = rgb2hls(imgdata[i])
+        h = hue
+        imgdata[i] = hls2rgb((h, l, s, a))
+    image.putdata(imgdata)
+    return image
+
+def h_dist(h1, h2):
+    """ distance between color hues in angular space,
+    where 1.0 == 0.0 (so distance must wrap around if > 1)"""
+    return min(abs(h1 + 1 - h2), abs(h1 - h2), abs(h1 - 1 - h2))
+
+
+def rgb2hls(t):
+    """ convert PIL-like RGB tuple (0 .. 255) to colorsys-like
+    HSL tuple (0.0 .. 1.0) """
+    (r, g, b, a) = t
+    r /= 255.0
+    g /= 255.0
+    b /= 255.0
+    h, l, s = rgb_to_hls(r, g, b)
+    return (h, l, s, a)
+
+
+def hls2rgb(t):
+    """ convert a colorsys-like HSL tuple (0.0 .. 1.0) to a
+    PIL-like RGB tuple (0 .. 255) """
+    (h, l, s, a) = t
+    r, g, b = hls_to_rgb(*(h, l, s))
+
+    r *= 255
+    g *= 255
+    b *= 255
+    return (int(r), int(g), int(b), a)
+
+
