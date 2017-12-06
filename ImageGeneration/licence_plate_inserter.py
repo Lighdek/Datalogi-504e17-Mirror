@@ -4,7 +4,7 @@ import numpy as np
 
 
 def combine_pictures(car, car_coordinats, licence_plate):
-    return four_point_transform(Image.open(licence_plate), car_coordinats, Image.open(car))
+    return four_point_transform(Image.open(licence_plate), np.array(car_coordinats), car)
 
 
 def sort(pts):

@@ -12,7 +12,7 @@ def read_from_file(file_path):
         file_text = f.read()
         if len(file_text) > 0:
             loaded_imgs = json.loads(file_text)
-            print(loaded_imgs)
+    return loaded_imgs
 
 
 def write_to_file(file_path):
