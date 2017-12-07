@@ -43,9 +43,11 @@ if __name__ == '__main__':
         ##pmodel = sc.parallelize(model)
         sharedModel = sc.broadcast((model.get_config(), model.get_weights()))
 
-        changedWeights = sharedModel.map(lambda x: trainModel(x))
+        taskDummy = sc.parallelize(range(64))
 
-        combinedCount, combinedWeights = changedWeights.reduce(lambda a, b: a[0] + b[0], a[1] + b[1])
+        changedWeights = taskDummy.map(lambda x: trainModel(sharedModel))
+
+        combinedCount, combinedWeights = changedWeights.reduce(lambda a, b: (a[0] + b[0], a[1] + b[1]))
 
         finalWeights = combinedWeights / combinedCount
 
