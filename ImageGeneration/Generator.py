@@ -92,8 +92,7 @@ def get_img(w_l, filepath):
     v = []
     if w_l:
         for item in filepath["cars"]:
-            if item.startswith("L"):
-                v.append(item)
+            v.append(item)
 
     else:
         for item in filepath["cars"]:
