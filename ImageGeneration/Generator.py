@@ -2,8 +2,7 @@ from PIL import Image, ImageFilter
 from os import listdir
 from os.path import join, dirname,basename
 import random
-from help_functions import loadImageMatrix
-import math
+import numpy as np
 
 from ImageGeneration.licence_plate_inserter import combine_pictures
 from ImageGeneration.image_effects import randomNoise, change_color
@@ -28,13 +27,13 @@ def find_file_paths():
             "backgrounds": listdir(background_root), "signs": listdir(signs_root)}
 
 
-def Generator(tbgenerated=1, wlicence=50, nolicar=75, nothing=50, size=(256,256)):
+def Generator(tbgenerated=1, wlicence=.50, nolicar=.75, nothing=.50, size=(256,256)):
     images = []
     labels = []
     filepath = find_file_paths()
 
-    if any(v <= 0 or v >= 100 for v in [wlicence, nolicar, nothing]):
-        raise ValueError(f"lpnl must be larger than 0 and less than 100"
+    if any(v < 0.0 or v > 1.0 for v in [wlicence, nolicar, nothing]):
+        raise ValueError(f"generator rates must be between 0.0 and 1.0"
                          f"wlicence: {wlicence}"
                          f"nolicar: {nolicar}"
                          f"nothing: {nothing}")
@@ -43,9 +42,9 @@ def Generator(tbgenerated=1, wlicence=50, nolicar=75, nothing=50, size=(256,256)
         chosen_bg = filepath["backgrounds"][random.randint(0, len(filepath["backgrounds"])- 1)]
         background = Image.open(join(background_root, chosen_bg))
 
-        has_licence_plate = True if random.randint(1, 100) < wlicence else False
-        has_car = True if random.randint(1, 100) < nolicar else False
-        has_nothing = True if random.randint(1, 100) < nothing else False
+        has_licence_plate = True if random.random() < wlicence else False
+        has_car = True if random.random() < nolicar else False
+        has_nothing = True if random.random() < nothing else False
 
         chosen_foreground = {
             True: get_img(True, filepath),
@@ -61,10 +60,9 @@ def Generator(tbgenerated=1, wlicence=50, nolicar=75, nothing=50, size=(256,256)
 
 
         if chosen_foreground is not None:
-            if has_licence_plate:
-                coordinates = get_coordinates(chosen_foreground)
             foreground = Image.open(chosen_foreground)
             if has_licence_plate:
+                coordinates = get_coordinates(chosen_foreground)
                 foreground = combine_pictures( foreground, coordinates, join(licence_plate_root, filepath["licenceplates"][random.randint(0, len(filepath["licenceplates"]) - 1)]))
 
             scale = min(background.size[0] / random.uniform(1.5, 3) / foreground.size[0],
@@ -72,9 +70,6 @@ def Generator(tbgenerated=1, wlicence=50, nolicar=75, nothing=50, size=(256,256)
 
             rotation_int = random.randint(-40, 40)
             foreground = foreground.rotate(rotation_int, expand=True)
-
-            #carWidth = math.ceil(background.size[0] / random.uniform(1.5, 3))
-            #carHeight = math.ceil(int((float(foreground.size[1]) * float(wpercent))))
 
             foreground = foreground.resize((int(foreground.size[0]*scale), int(foreground.size[1]*scale)), Image.ANTIALIAS)
 
@@ -88,7 +83,7 @@ def Generator(tbgenerated=1, wlicence=50, nolicar=75, nothing=50, size=(256,256)
             background.paste(foreground,offset,mask=foreground)
 
         background = apply_filter(background)
-        images.append(background)
+        images.append(np.asarray(background))
         labels.append(0 if has_licence_plate else 1 if has_car else 2 if not has_nothing else 3)
     return images, labels
 

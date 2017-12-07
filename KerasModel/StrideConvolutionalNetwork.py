@@ -40,6 +40,7 @@ def init():
     return model
 
 
+"""
 if __name__ == '__main__':
     model = init()
 
@@ -51,10 +52,13 @@ if __name__ == '__main__':
             "../ImageGeneration/Images/Backgrounds"],
             tbgenerated=200)
 
-        model.fit(np.array(images), labels, batch_size=18, epochs=5, verbose=1, validation_split=0.25)
+        model.fit(np.array(images), labels, batch_size=150, epochs=1, verbose=1, validation_split=0.25)
         model.summary()
 
-        if i % 10 == 0:
+        if i % 25 == 0:
             printModel(model)
 
         i += 1
+
+        #model.sav
+"""
