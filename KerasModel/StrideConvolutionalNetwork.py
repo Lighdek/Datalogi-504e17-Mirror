@@ -40,17 +40,13 @@ def init():
     return model
 
 
-"""
+
 if __name__ == '__main__':
     model = init()
 
     i = 1
     while True:
-        images, labels = ImageGenerator.generator([
-            "../ImageGeneration/Images/WithLicence",
-            "../ImageGeneration/Images/WithoutLicence",
-            "../ImageGeneration/Images/Backgrounds"],
-            tbgenerated=200)
+        images, labels = ImageGenerator.Generator(200)
 
         model.fit(np.array(images), labels, batch_size=150, epochs=1, verbose=1, validation_split=0.25)
         model.summary()
@@ -61,4 +57,3 @@ if __name__ == '__main__':
         i += 1
 
         #model.sav
-"""

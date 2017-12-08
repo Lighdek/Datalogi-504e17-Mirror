@@ -13,18 +13,20 @@ modelExt = ".hem"
 modelFilename = os.path.join(*theThing.__name__.split('.')) + modelExt
 print(modelFilename)
 
-def trainModel(modelTuple):
 
+def trainModel(x, modelTuple):
+
+    print("Training model: %i" % x)
     config, weights = modelTuple
 
-    model = keras.models.model_from_config(config)
+    model = keras.models.Sequential.from_config(config)
     model.set_weights(weights)
 
     images, labels = ImageGenerator.Generator(200)
 
     metrics = model.train_on_batch(np.array(images), labels)
 
-    return 1, model.get_weights
+    return 1, np.array(model.get_weights())
 
 
 if __name__ == '__main__':
@@ -45,7 +47,7 @@ if __name__ == '__main__':
 
         taskDummy = sc.parallelize(range(64))
 
-        changedWeights = taskDummy.map(lambda x: trainModel(sharedModel))
+        changedWeights = taskDummy.map(lambda x: trainModel(x, sharedModel))
 
         combinedCount, combinedWeights = changedWeights.reduce(lambda a, b: (a[0] + b[0], a[1] + b[1]))
 
