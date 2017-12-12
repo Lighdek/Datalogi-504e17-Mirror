@@ -50,7 +50,7 @@ class Output:
     The output from a Layer
     Used as input for most Layers
     """
-    matrix = None
+    matrix: np.ndarray = None
 
     def __init__(self, x, y, z):
         matrix = np.empty((x, y, z))
@@ -65,8 +65,9 @@ class WeightBiasDelta:
     deltaWeight = None
     deltaBias = None
 
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, inShape, outShape) -> None:
+        self.deltaWeight = np.empty((outShape, inShape))
+        self.deltaBias = np.empty(outShape)
 
 
 class Layer:
@@ -79,10 +80,10 @@ class Layer:
         self.activation = activation
         super().__init__()
 
-    def apply(self, input_: Output):
+    def apply(self, input_: Output) -> np.ndarray:
         raise NotImplementedError()
 
-    def backpropagate(self, current: Output, previous: Output):
+    def backpropagate(self, current: Output, previous: Output, error: np.ndarray):
         raise NotImplementedError()
 
 
@@ -95,7 +96,7 @@ class FullyConnectedLayer(Layer):
         self.weights = np.random.rand(out_, in_)#empty((out_, in_))
         self.biases = np.empty((out_,))
 
-    def apply(self, input_: np.ndarray):
+    def apply(self, input_: np.ndarray) -> np.ndarray:
         assert len(input_.shape) == input_.ndim
         if input_.ndim > 1 or len(input_) > self.weights.shape[1]:
             raise ValueError("Input shape %s, expected vector of length (%i)"
@@ -103,8 +104,20 @@ class FullyConnectedLayer(Layer):
 
         return self.activation(self.weights.dot(input_) + self.biases)
 
-    def backpropagate(self, current: Output, previous: Output):
-            pass
+    def backpropagate(self, previous: Output, current: Output, error: np.ndarray) -> (WeightBiasDelta, np.ndarray):
+        delta: WeightBiasDelta = WeightBiasDelta(len(previous.matrix), len(current.matrix)) #TODO: don't calculate length here
+        deltaPrevious = np.empty(len(previous.matrix))
+        for i in range(len(self.biases)): #TODO: similar here
+            tmp = current.matrix[i]
+            delta.deltaBias[i] = tmp if tmp > 0 else tmp*0.001 #TODO: class?
+
+            delta.deltaWeight[i] = 0
+            for j in range(len(previous.matrix)):
+                #delta.deltaWeight[i] =
+                pass
+            #deltaPrevious =
+
+
 
 
 class ConvolutionalLayer(Layer):
