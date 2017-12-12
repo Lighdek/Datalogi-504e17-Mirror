@@ -65,11 +65,11 @@ def Generator(tbgenerated=1, wlicence=.50, nolicar=.75, nothing=.50, size=(256,2
                 coordinates = get_coordinates(chosen_foreground)
                 foreground = combine_pictures( foreground, coordinates, join(licence_plate_root, filepath["licenceplates"][random.randint(0, len(filepath["licenceplates"]) - 1)]))
 
-            scale = min(background.size[0] / random.uniform(1.5, 3) / foreground.size[0],
-                        background.size[1] / random.uniform(1.5, 3) / foreground.size[1])
-
             rotation_int = random.randint(-40, 40)
             foreground = foreground.rotate(rotation_int, expand=True)
+
+            scale = min(background.size[0] / random.uniform(1.5, 3) / foreground.size[0],
+                        background.size[1] / random.uniform(1.5, 3) / foreground.size[1])
 
             foreground = foreground.resize((int(foreground.size[0]*scale), int(foreground.size[1]*scale)), Image.ANTIALIAS)
 
