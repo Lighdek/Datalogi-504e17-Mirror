@@ -1,14 +1,6 @@
-import os
-
-from PIL import Image
 from keras import optimizers
 from keras.models import Sequential
-from keras.layers import Conv2D, MaxPool2D, Dense, Flatten
-from ImageGeneration import Generator as ImageGenerator
-import numpy as np
-
-from KerasModel import printModel
-from help_functions import print_picture, loadImageMatrix
+from keras.layers import Conv2D, Dense, Flatten
 
 
 def init():
@@ -34,26 +26,6 @@ def init():
     ])
 
     optimizer = optimizers.adam(lr=1e-4, decay=1e-6)
-    print(model.weights)
     model.compile(loss='mean_squared_error', optimizer=optimizer, metrics=['accuracy'])
 
     return model
-
-
-
-if __name__ == '__main__':
-    model = init()
-
-    i = 1
-    while True:
-        images, labels = ImageGenerator.Generator(200)
-
-        model.fit(np.array(images), labels, batch_size=150, epochs=1, verbose=1, validation_split=0.25)
-        model.summary()
-
-        if i % 25 == 0:
-            printModel(model)
-
-        i += 1
-
-        #model.sav

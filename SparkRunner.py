@@ -1,11 +1,11 @@
 import keras
-
-import help_functions
-from ImageGeneration import Generator as ImageGenerator
 import numpy as np
 import os
 
-from KerasModel import printModel, StrideConvolutionalNetwork as theThing
+from keras import optimizers
+
+from ImageGeneration import ImageLoader
+from KerasModel import StrideConvolutionalNetwork as theThing
 
 from pyspark import SparkContext, SparkConf
 
@@ -13,6 +13,7 @@ modelExt = ".hem"
 modelFilename = os.path.join(*theThing.__name__.split('.')) + modelExt
 print(modelFilename)
 
+# loadImages() here ???
 
 def trainModel(x, modelTuple):
 
@@ -22,9 +23,15 @@ def trainModel(x, modelTuple):
     model = keras.models.Sequential.from_config(config)
     model.set_weights(weights)
 
-    images, labels = ImageGenerator.Generator(200)
+    optimizer = optimizers.adam(lr=1e-4, decay=1e-6)
+    model.compile(loss='mean_squared_error', optimizer=optimizer, metrics=['accuracy'])
 
-    metrics = model.train_on_batch(np.array(images), labels)
+    images, labels = ImageLoader.loadImages()
+
+    metrics = model.train_on_batch(np.array(images), labels)  # TODO: look at class_weight and sample_weight
+
+    for i in range(len(metrics)):
+        print("%s: %s" % (model.metrics_names[i], metrics[i]))
 
     return 1, np.array(model.get_weights())
 
@@ -37,17 +44,18 @@ if __name__ == '__main__':
         print(e)
         model = theThing.init()
 
+    model.summary()
+
     conf = SparkConf().setAppName(theThing.__name__)
     sc = SparkContext(conf=conf)
 
     for i in range(100):
 
-        ##pmodel = sc.parallelize(model)
         sharedModel = sc.broadcast((model.get_config(), model.get_weights()))
 
         taskDummy = sc.parallelize(range(64))
 
-        changedWeights = taskDummy.map(lambda x: trainModel(x, sharedModel))
+        changedWeights = taskDummy.map(lambda x: trainModel(x, sharedModel.value))
 
         combinedCount, combinedWeights = changedWeights.reduce(lambda a, b: (a[0] + b[0], a[1] + b[1]))
 
@@ -56,27 +64,6 @@ if __name__ == '__main__':
         model.set_weights(finalWeights)
         model.save(modelFilename)
 
-
-
-
-def __nothing():
-        print("generating images")
-        images, labels = ImageGenerator.Generator(200)
-        print("done generating")
-        #print(images.shape)
-        #print(labels.shape)
-
-        for image in images:
-            help_functions.print_picture(image)
-
-        metrics = model.train_on_batch(np.array(images), labels)  # TODO: look at class_weight and sample_weight
-        # model.fit(np.array(images), labels, batch_size=50, epochs=1, verbose=1, validation_split=0.25)
-        # model.summary()
-
-        for i in range(len(metrics)):
-            print("%s: %s" % (model.metrics_names[i], metrics[i]))
-
-        #if i % 25 == 0:
-            #printModel(model)
-
-        model.save(modelFilename)
+        print("TRAINING TEMP ON MASTER!!!!!")
+        print(model.metrics_names)
+        trainModel(1337,(model.get_config(), model.get_weights()))

@@ -3,3 +3,7 @@
 __pycache__/
 
 *.hem
+
+!.idea/webServers.xml
+!.idea/deployment.xml
+OurImages/

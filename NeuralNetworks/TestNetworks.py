@@ -1,6 +1,6 @@
 import numpy as np
 
-from neuralnetwork import Model, FullyConnectedLayer, ConvolutionalLayer
+from . import Model, FullyConnectedLayer, ConvolutionalLayer
 
 modelFullyConnected = Model("TestFullyConnected", [
     FullyConnectedLayer(3, 4)
