@@ -1,6 +1,6 @@
 import numpy as np
 import math
-import activation_functions as af
+from NeuralNetworks import activation_functions as af
 
 
 class Model:

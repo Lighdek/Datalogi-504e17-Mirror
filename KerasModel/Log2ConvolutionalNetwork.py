@@ -1,14 +1,8 @@
-import os
-
-from PIL import Image
 from keras import optimizers
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPool2D, Dense, Flatten
 from ImageGeneration import Generator as ImageGenerator
 import numpy as np
-
-from KerasModel import printModel
-from help_functions import print_picture, loadImageMatrix
 
 def init():
     model = Sequential([
