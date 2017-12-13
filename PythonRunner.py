@@ -3,7 +3,7 @@ import numpy as np
 import os
 
 from ImageGeneration import ImageLoader
-from KerasModel import MatiasStrideConvolutionalNetwork as theThing
+from KerasModel import StrideConvolutionalNetwork as theThing
 
 modelExt = ".hem"
 modelFilename = os.path.join(*theThing.__name__.split('.')) + modelExt
@@ -18,10 +18,9 @@ if __name__ == '__main__':
 
     model.summary()
 
-    images, labels = ImageLoader.loadImages(count=20000) #ImageGenerator.Generator(200)
+    images, labels = ImageLoader.loadImages(count=5000) #ImageGenerator.Generator(200)
 
-    model.fit(np.array(images), labels, batch_size=200, epochs=20, verbose=1, validation_split=0.10)
-    model.summary()
+    model.fit(np.array(images), labels, batch_size=20, epochs=100, verbose=1, validation_split=0.10)
 
 
     model.save(modelFilename)
