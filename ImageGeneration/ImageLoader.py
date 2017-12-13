@@ -1,9 +1,11 @@
 import os
+import random
 import re
 from PIL import Image
 import numpy as np
 
 folderPath = "OurImages"
+
 
 def loadImages(count=200):
     files = os.listdir(folderPath)
@@ -15,11 +17,18 @@ def loadImages(count=200):
     if len(files) < 1:
         raise OSError("No images in folder %s " % folderPath)
 
-    for i in range(min(count, len(files))):
-        # TODO: currently only loading count first files
-        match = re.search('type(\d+)', files[i])
+    chosen = random.choices(files, k=count)
+
+    for f in chosen:
+
+        match = re.search('type(\d+)', f)
         if match:
-            imgs.append(np.asarray(Image.open("OurImages/" + files[i]).resize((256, 256)))[:, :, :3])
+            imgs.append(
+                np.asarray(
+                    Image.open("OurImages/" + f).resize((512, 512)))
+                [:, :, :3]
+            )
+
             labels.append(match.group(1) == "0")
 
     if len(imgs) < 1:

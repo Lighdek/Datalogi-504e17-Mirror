@@ -1,14 +1,6 @@
-import os
-
-from PIL import Image
 from keras import optimizers
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPool2D, Dense, Flatten
-from ImageGeneration import Generator as ImageGenerator
-import numpy as np
-
-from KerasModel import printModel
-from help_functions import print_picture, loadImageMatrix
 
 def init():
     model = Sequential([
@@ -44,23 +36,3 @@ def init():
     model.compile(loss='mean_squared_error', optimizer=optimizer, metrics=['accuracy'])
 
     return model
-
-
-if __name__ == '__main__':
-    model = init()
-
-    i = 1
-    while True:
-        images, labels = ImageGenerator.generator([
-            "../ImageGeneration/Images/WithLicence",
-            "../ImageGeneration/Images/WithoutLicence",
-            "../ImageGeneration/Images/Backgrounds"],
-            tbgenerated=200)
-
-        model.fit(np.array(images), labels, batch_size=18, epochs=5, verbose=1, validation_split=0.25)
-        model.summary()
-
-        if i % 10 == 0:
-            printModel(model)
-
-        i += 1
