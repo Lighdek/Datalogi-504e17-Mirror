@@ -4,7 +4,7 @@ import re
 from PIL import Image
 import numpy as np
 
-folderPath = "OurImages"
+folderPath = "OurImages/512_512"
 
 
 def loadImages(count=200):
@@ -25,7 +25,7 @@ def loadImages(count=200):
         if match:
             imgs.append(
                 np.asarray(
-                    Image.open("OurImages/" + f).resize((512, 512)))
+                    Image.open("OurImages/512_512/" + f).resize((512, 512)))
                 [:, :, :3]
             )
 

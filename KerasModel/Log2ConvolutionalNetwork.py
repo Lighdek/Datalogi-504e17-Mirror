@@ -5,7 +5,13 @@ from keras.layers import Conv2D, MaxPool2D, Dense, Flatten
 def init():
     model = Sequential([
 
-        Conv2D(filters=12, kernel_size=3, activation='relu', padding='same', input_shape=(256, 256, 3)),
+        Conv2D(filters=12, kernel_size=3, activation='relu', padding='same', input_shape=(512, 512, 3)),
+        MaxPool2D(padding='same'),  # 256
+
+        Conv2D(filters=16, kernel_size=3, activation='relu', padding='same'),
+        MaxPool2D(padding='same'),  # 128
+
+        Conv2D(filters=16, kernel_size=3, activation='relu', padding='same'),
         MaxPool2D(padding='same'),  # 64
 
         Conv2D(filters=16, kernel_size=3, activation='relu', padding='same'),
@@ -26,7 +32,7 @@ def init():
         Conv2D(filters=16, kernel_size=3, activation='relu', padding='same'),
         MaxPool2D(padding='same'),  # 1
 
-        Flatten(),
+        Flatten(input_shape=(1,1,None)),
         Dense(1, activation='sigmoid')
 
     ])
