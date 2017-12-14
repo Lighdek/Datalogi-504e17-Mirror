@@ -4,12 +4,45 @@ import re
 import pickle
 from PIL import Image
 import numpy as np
+from os import path, listdir
 
-folderPath = "OurImages/512_512/"
+
+def loadImages(datasets: list=None, shuffle: bool=True, folderPath: str="OurImages/") -> list:
+    if datasets is None:
+        datasets = [
+            (100, 'RealFrontBack'),
+            (100, 'GenLicenseOnBackground')
+        ]
+
+    imagePools = {}
+    for (count, setName) in datasets:
+        imagePools[setName] = (
+            listdir(path.join(folderPath, setName, "T")[:count//2 + count % 2]),
+            listdir(path.join(folderPath, setName, "F")[:count//2])
+        )
+
+    imgs = []
+
+    for setName, pool in imagePools.items():
+        print("Loading dataset %s" % setName)
+        for i in range(len(pool[0])):
+            imgs.append(
+                Image.open(path.join(folderPath, setName, "T", pool[0][i]))
+            )
+            if i < len(pool[1]):
+                imgs.append(
+                    Image.open(path.join(folderPath, setName, "F", pool[1][i]))
+                )
+
+    if shuffle:
+        random.shuffle(imgs)
+
+    return imgs
 
 
-def loadImages(count=200, shano=False):
-    files = os.listdir(folderPath if not shano else "OurImages/plateScanner/cars_train/")
+folderPathOld = "OurImages/512_512/"
+def loadImagesOld(count=200, shano=False):
+    files = os.listdir(folderPathOld)
     imgs = []
     labels = []
 
@@ -47,7 +80,7 @@ def loadImages(count=200, shano=False):
             if match:
                 imgs.append(
                     np.asarray(
-                        Image.open(folderPath + f).resize((512, 512))
+                        Image.open(folderPathOld + f).resize((512, 512))
                     )[:, :, :3]
                 )
 
