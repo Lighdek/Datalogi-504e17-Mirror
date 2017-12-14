@@ -32,7 +32,7 @@ def init():
         Conv2D(filters=16, kernel_size=3, activation='relu', padding='same'),
         MaxPool2D(padding='same'),  # 1
 
-        Flatten(input_shape=(1,1,None)),
+        Flatten(input_shape=(1, 1, None)),
         Dense(1, activation='sigmoid')
 
     ])

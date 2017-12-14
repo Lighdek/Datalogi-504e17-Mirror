@@ -86,13 +86,17 @@ if __name__ == '__main__':
 
         sharedModel = sc.broadcast((model.get_config(), model.get_weights()))
 
-        taskDummy = sc.parallelize(range(64))
+        taskDummy = sc.parallelize(range(56))
 
         changedWeights = taskDummy.map(lambda x: trainModel(x, sharedModel.value))
 
         combinedCount, combinedWeights = changedWeights.reduce(lambda a, b: (a[0] + b[0], a[1] + b[1]))
 
         finalWeights = combinedWeights / combinedCount
+
+        if True:  # Calculate the change from the average, so we can scale it up
+            deltaWeights = finalWeights - model.get_weights()
+            finalWeights = model.get_weights() + deltaWeights*combinedCount
 
         model.set_weights(finalWeights)
         model.save(modelFilename)
