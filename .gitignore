@@ -6,4 +6,4 @@ __pycache__/
 
 !.idea/webServers.xml
 !.idea/deployment.xml
-OurImages/
+/OurImages/**
