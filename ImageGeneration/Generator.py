@@ -4,9 +4,7 @@ from os.path import join, dirname,basename
 import random
 import numpy as np
 
-from ImageGeneration.licence_plate_inserter import combine_pictures
 from ImageGeneration.image_effects import randomNoise, change_color
-from ImageGeneration.pyImgMarker.image_handler import read_from_file
 # The dict with all the pictures in. The key is the foldername,
 # and the value is an array with all pictures in said folder
 
@@ -23,96 +21,95 @@ signs_root = join(images_root, "signs")
 
 
 def find_file_paths():
-    return {"cars": listdir(cars_root), "licenceplates": listdir(licence_plate_root),
+    return {"cars": listdir(cars_root), "licenseplates": listdir(licence_plate_root),
             "backgrounds": listdir(background_root), "signs": listdir(signs_root)}
 
 
-def Generator(tbgenerated=1, wlicence=.50, nolicar=.75, nothing=.50, size=(256,256)):
+rotate_between = ()
+
+
+def Generator(tbgenerated=1, max_noise = 4, set_amount_of_noise = False, rotate_degrees=(-30,30),
+              size_difference_noise=(1.5, 3), size_difference_license=(1.3, 2),  wlicence=.50,
+              nolicar=.75, nothing=.50, size=(512,512), blur = .3, rndom_noise = .3, blur_amount_random = (0, 2),
+              noise_amount_random = (3, 10)):
+    global rotate_between
     images = []
     labels = []
+    rotate_between = rotate_degrees
+
     filepath = find_file_paths()
 
-    if any(v < 0.0 or v > 1.0 for v in [wlicence, nolicar, nothing]):
+    if any(v < 0.0 or v > 1.0 for v in [wlicence, nolicar, nothing, blur, rndom_noise]):
         raise ValueError(f"generator rates must be between 0.0 and 1.0"
                          f"wlicence: {wlicence}"
                          f"nolicar: {nolicar}"
-                         f"nothing: {nothing}")
+                         f"nothing: {nothing}"
+                         f"blur: {blur}"
+                         f"rndom_noise: {rndom_noise}")
 
     for x in range(0, tbgenerated):
-        chosen_bg = filepath["backgrounds"][random.randint(0, len(filepath["backgrounds"])- 1)]
-        background = Image.open(join(background_root, chosen_bg))
+        noises = []
+
+        chocen_license_plate = filepath["licenseplates"][random.randint(0, len(filepath["licenseplates"]) - 1 )]
+        background = Image.open(join(background_root,filepath["backgrounds"][random.randint(0, len(filepath["backgrounds"])- 1)]))
 
         has_licence_plate = True if random.random() < wlicence else False
-        has_car = True if random.random() < nolicar else False
-        has_nothing = True if random.random() < nothing else False
+        noise_loop = True
 
-        chosen_foreground = {
-            True: get_img(True, filepath),
-            False: {
-                True: get_img(False, filepath),
-                False: {
-                    True: None,
-                    False: join(signs_root, filepath["signs"][random.randint(0, len(filepath["signs"]) - 1 )])
-                }.get(has_nothing)
-            }.get(has_car)
-        }.get(has_licence_plate)
+        while noise_loop:
+            if random.random() < nolicar:
+                noises.append(Image.open(join(cars_root, filepath["cars"][random.randint(0, len(filepath["cars"]) - 1 )])))
+
+            elif random.random() >= nothing and has_licence_plate is False:
+                noises.append(Image.open(join(signs_root, filepath["signs"][random.randint(0, len(filepath["signs"]) - 1)])))
+
+            noise_loop = False if ((set_amount_of_noise is not False or set_amount_of_noise is not None)
+                                   and len(noises) >= set_amount_of_noise) or random.randint(0, max_noise) <= len(noises) else True
+
         background = background.resize(size)
 
+        for noise in noises:
+            noise, offset = image_manipulationsss(noise, background.size, size_difference_noise)
 
-        if chosen_foreground is not None:
-            foreground = Image.open(chosen_foreground)
-            if has_licence_plate:
-                coordinates = get_coordinates(chosen_foreground)
-                foreground = combine_pictures( foreground, coordinates, join(licence_plate_root, filepath["licenceplates"][random.randint(0, len(filepath["licenceplates"]) - 1)]))
-
-            rotation_int = random.randint(-40, 40)
-            foreground = foreground.rotate(rotation_int, expand=True)
-
-            scale = min(background.size[0] / random.uniform(1.5, 3) / foreground.size[0],
-                        background.size[1] / random.uniform(1.5, 3) / foreground.size[1])
-
-            foreground = foreground.resize((int(foreground.size[0]*scale), int(foreground.size[1]*scale)), Image.ANTIALIAS)
-
-            offset = (random.randint(0, background.size[0] - foreground.size[0]),
-                      random.randint(0, background.size[1] - foreground.size[1]))
             try:
-                foreground = change_color(foreground, random.random())
+                noise = change_color(noise, random.random())
             except Exception:
-                print(f"forground_data: {list(foreground.getdata())}")
+                print(f"forground_data: {list(noise.getdata())}")
                 raise
-            background.paste(foreground,offset,mask=foreground)
+            background.paste(noise,offset,mask=noise)
 
-        background = apply_filter(background)
+        if has_licence_plate:
+            chocen_license_plate, offset = image_manipulationsss(chocen_license_plate, background.size, size_difference_license)
+            background.paste(chocen_license_plate, offset, mask=chocen_license_plate)
+
+        background = apply_filter(background, blur, rndom_noise, blur_amount_random, noise_amount_random)
+
         images.append(np.asarray(background))
-        labels.append(0 if has_licence_plate else 1 if has_car else 2 if not has_nothing else 3)
+
+        labels.append(has_licence_plate)
+
     return images, labels
 
 
-def get_img(w_l, filepath):
-    v = []
-    if w_l:
-        for item in filepath["cars"]:
-            v.append(item)
+def image_manipulationsss(fg, bgsize, sd):
+    rotation_int = random.randint(rotate_between[0], rotate_between[1])
+    fg = fg.rotate(rotation_int, expand=True)
 
-    else:
-        for item in filepath["cars"]:
-            if not item.startswith("L"):
-                v.append(item)
+    scale = min(bgsize[0] / random.uniform(sd[0], sd[1]) / fg.size[0],
+                bgsize[1] / random.uniform(sd[0], sd[1]) / fg.size[1])
 
-    return join(cars_root, v[random.randint(0, len(v) - 1)])
+    noise = fg.resize((int(fg.size[0] * scale), int(fg.size[1] * scale)), Image.ANTIALIAS)
 
-
-def get_coordinates(car):
-
-    return read_from_file(join(images_root, "imgSettings.JSON"))[basename(car)]
+    offset = (random.randint(0, bgsize[0] - noise.size[0]),
+              random.randint(0, bgsize[1] - noise.size[1]))
+    return fg, offset
 
 
-def apply_filter(image):
-    choice = random.randint(0,2)
-    if choice is 0:
-        img = image.filter(ImageFilter.GaussianBlur(radius=(random.randint(1,4))))
-    elif choice is 1:
-        img = randomNoise(image, random.randint(3, 10))
-    else:
-        img = image
-    return img
+def apply_filter(image, blur, rndom_noise, blur_amount_random, noise_amount_random):
+    choice = random.random()
+    if choice < blur:
+        image = image.filter(ImageFilter.GaussianBlur(radius=(random.randint(blur_amount_random[0],blur_amount_random[1]))))
+    elif choice < blur + rndom_noise:
+        image = randomNoise(image, random.randint(noise_amount_random[0], noise_amount_random[1]))
+
+    return image
