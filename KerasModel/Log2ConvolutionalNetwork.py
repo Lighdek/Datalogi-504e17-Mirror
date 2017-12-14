@@ -1,13 +1,17 @@
 from keras import optimizers
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPool2D, Dense, Flatten
-from ImageGeneration import Generator as ImageGenerator
-import numpy as np
 
 def init():
     model = Sequential([
 
-        Conv2D(filters=12, kernel_size=3, activation='relu', padding='same', input_shape=(256, 256, 3)),
+        Conv2D(filters=12, kernel_size=3, activation='relu', padding='same', input_shape=(512, 512, 3)),
+        MaxPool2D(padding='same'),  # 256
+
+        Conv2D(filters=16, kernel_size=3, activation='relu', padding='same'),
+        MaxPool2D(padding='same'),  # 128
+
+        Conv2D(filters=16, kernel_size=3, activation='relu', padding='same'),
         MaxPool2D(padding='same'),  # 64
 
         Conv2D(filters=16, kernel_size=3, activation='relu', padding='same'),
@@ -28,7 +32,7 @@ def init():
         Conv2D(filters=16, kernel_size=3, activation='relu', padding='same'),
         MaxPool2D(padding='same'),  # 1
 
-        Flatten(),
+        Flatten(input_shape=(1,1,None)),
         Dense(1, activation='sigmoid')
 
     ])
@@ -38,23 +42,3 @@ def init():
     model.compile(loss='mean_squared_error', optimizer=optimizer, metrics=['accuracy'])
 
     return model
-
-
-if __name__ == '__main__':
-    model = init()
-
-    i = 1
-    while True:
-        images, labels = ImageGenerator.generator([
-            "../ImageGeneration/Images/WithLicence",
-            "../ImageGeneration/Images/WithoutLicence",
-            "../ImageGeneration/Images/Backgrounds"],
-            tbgenerated=200)
-
-        model.fit(np.array(images), labels, batch_size=18, epochs=5, verbose=1, validation_split=0.25)
-        model.summary()
-
-        if i % 10 == 0:
-            printModel(model)
-
-        i += 1

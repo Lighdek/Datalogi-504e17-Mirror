@@ -1,3 +1,4 @@
+import keras
 import numpy as np
 import os
 
@@ -9,18 +10,16 @@ modelFilename = os.path.join(*theThing.__name__.split('.')) + modelExt
 print(modelFilename)
 
 if __name__ == '__main__':
-    model = theThing.init()
+    try:
+        model = keras.models.load_model(modelFilename)
+    except OSError as e:
+        print(e)
+        model = theThing.init()
 
-    i = 1
-    while True:
-        images, labels = ImageLoader.loadImages() #ImageGenerator.Generator(200)
+    model.summary()
 
-        model.fit(np.array(images), labels, batch_size=150, epochs=1, verbose=1, validation_split=0.25)
-        model.summary()
+    images, labels = ImageLoader.loadImages(count=5000) #ImageGenerator.Generator(200)
 
-        #if i % 25 == 0:
-            #printModel(model)
+    model.fit(np.array(images), labels, batch_size=20, epochs=100, verbose=1, validation_split=0.10)
 
-        i += 1
-
-        model.save(modelFilename)
+    model.save(modelFilename)
