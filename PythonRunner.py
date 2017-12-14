@@ -22,5 +22,4 @@ if __name__ == '__main__':
 
     model.fit(np.array(images), labels, batch_size=20, epochs=100, verbose=1, validation_split=0.10)
 
-
     model.save(modelFilename)
