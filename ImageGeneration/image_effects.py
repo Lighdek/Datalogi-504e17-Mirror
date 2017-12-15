@@ -1,9 +1,9 @@
 from PIL import Image
-from help_functions import loadImageMatrix
+from NeuralNetworks.help_functions import loadImageMatrix
 from colorsys import rgb_to_hls, hls_to_rgb
 import random
 import numpy as np
-from help_functions import clamp
+from NeuralNetworks.help_functions import clamp
 
 
 def randomNoise(imageMatrix, magnitude=10 ):
