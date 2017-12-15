@@ -25,7 +25,7 @@ def loadImages(datasets: list=None, shuffle: bool=True, folderPath: str="OurImag
     labels = []
 
     for setName, pool in imagePools.items():
-        print("Loading dataset %s of size %i" % (setName, len(pool[setName])))
+        print("Loading dataset %s of size %i" % (setName, len(pool[0])+len(pool[1])))
         for i in range(len(pool[0])):
             imgs.append(
                 np.asarray(
