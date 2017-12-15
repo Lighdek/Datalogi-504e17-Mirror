@@ -17,27 +17,34 @@ def loadImages(datasets: list=None, shuffle: bool=True, folderPath: str="OurImag
     imagePools = {}
     for (count, setName) in datasets:
         imagePools[setName] = (
-            listdir(path.join(folderPath, setName, "T")[:count//2 + count % 2]),
-            listdir(path.join(folderPath, setName, "F")[:count//2])
+            listdir(path.join(folderPath, setName, "T"))[:count//2 + count % 2],
+            listdir(path.join(folderPath, setName, "F"))[:count//2]
         )
 
     imgs = []
+    labels = []
 
     for setName, pool in imagePools.items():
-        print("Loading dataset %s" % setName)
+        print("Loading dataset %s of size %i" % (setName, len(pool[setName])))
         for i in range(len(pool[0])):
             imgs.append(
-                Image.open(path.join(folderPath, setName, "T", pool[0][i]))
+                np.asarray(
+                    Image.open(path.join(folderPath, setName, "T", pool[0][i]))
+                )
             )
+            labels.append(True)
             if i < len(pool[1]):
                 imgs.append(
-                    Image.open(path.join(folderPath, setName, "F", pool[1][i]))
+                    np.asarray(
+                        Image.open(path.join(folderPath, setName, "F", pool[1][i]))
+                    )
                 )
+                labels.append(False)
 
     if shuffle:
         random.shuffle(imgs)
 
-    return imgs
+    return imgs, labels
 
 
 folderPathOld = "OurImages/512_512/"
@@ -49,7 +56,7 @@ def loadImagesOld(count=200, shano=False):
     if count < 1:
         raise ValueError("Tried to load 0 images")
     if len(files) < 1:
-        raise OSError("No images in folder %s " % folderPath)
+        raise OSError("No images in folder %s " % folderPathOld)
 
     if shano:
         with open("OurImages/plateScanner/DhatPlate.pickle", "rb") as fil:
