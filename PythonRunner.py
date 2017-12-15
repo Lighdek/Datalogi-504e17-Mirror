@@ -1,6 +1,7 @@
 import keras
 import numpy as np
 import os
+import metrics as m
 from ImageGeneration import ImageLoader
 from KerasModel import Log2ConvolutionalNetwork as theThing
 
@@ -11,7 +12,10 @@ batchsize = 50
 
 if __name__ == '__main__':
     try:
-        model = keras.models.load_model(modelFilename)
+        model = keras.models.load_model(modelFilename, custom_objects={'f1measure': m.f1measure,
+                                                                       'f_half_measure': m.f_half_measure,
+                                                                       'precision': m.precision,
+                                                                       'recall': m.recall})
     except OSError as e:
         print(e)
         model = theThing.init()
@@ -24,11 +28,11 @@ if __name__ == '__main__':
 
     #images, labels = ImageLoader.loadImagesOld(count=5000) #ImageGenerator.Generator(200)
 
-    images, labels = ImageLoader.loadImages(datasets = [(0, 'RealFrontBack'), (10000, 'GenLicenseOnBackground')])
+    images, labels = ImageLoader.loadImages(datasets = [(1200, 'RealFrontBack'), (19400, 'GenLicenseOnBackground')])
 
-    model.fit(np.array(images), labels, batch_size=batchsize, epochs=50, verbose=1,
+    model.fit(np.array(images), labels, batch_size=batchsize, epochs=100, verbose=1,
               validation_split=0.10, shuffle=True, callbacks=[callback])
 
     #model.evaluate(np.array(images), labels, batch_size=50, verbose=1)
 
-    model.save(modelFilename)
+    model
