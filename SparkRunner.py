@@ -16,38 +16,88 @@ modelExt = ".hem"
 modelFilename = os.path.join(*theThing.__name__.split('.')) + modelExt
 print(modelFilename)
 
-def loadImages(datasets: list=None, shuffle: bool=True, folderPath: str="OurImages/") -> list:
+
+### Start metrics
+
+from keras import backend as K
+
+def precision(y_true, y_pred):
+    true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+    predicted_positives = K.sum(K.round(K.clip(y_pred, 0, 1)))
+    precision = true_positives / (predicted_positives + K.epsilon())
+    return precision
+
+
+def recall(y_true, y_pred):
+    true_positives = K.sum(K.round(K.clip(y_true * y_pred, 0, 1)))
+    possible_positives = K.sum(K.round(K.clip(y_true, 0, 1)))
+    recall = true_positives / (possible_positives + K.epsilon())
+    return recall
+
+
+def fbeta_score(y_true, y_pred, beta=1):
+    if beta < 0:
+        raise ValueError('The lowest choosable beta is zero (only precision).')
+
+    # If there are no true positives, fix the F score at 0 like sklearn.
+    if K.sum(K.round(K.clip(y_true, 0, 1))) == 0:
+        return 0
+
+    p = precision(y_true, y_pred)
+    r = recall(y_true, y_pred)
+    bb = beta ** 2
+    fbeta_score = (1 + bb) * (p * r) / (bb * p + r + K.epsilon())
+    return fbeta_score
+
+
+def f1measure(y_true, y_pred):
+    return fbeta_score(y_true, y_pred, beta=1)
+
+def f_half_measure(y_true, y_pred):
+    return fbeta_score(y_true, y_pred, beta=0.5)
+
+#### end metrics
+
+def loadImages(datasets: list=None, shuffle: bool=True, folderPath: str="/home/user/OurImages/") -> tuple:
     if datasets is None:
         datasets = [
-            (100, 'RealFrontBack'),
-            (100, 'GenLicenseOnBackground')
+            #(100, 'RealFrontBack'),
+            (2800, 'GenLicenseOnBackground')
         ]
 
     imagePools = {}
     for (count, setName) in datasets:
         imagePools[setName] = (
-            listdir(path.join(folderPath, setName, "T")[:count//2 + count % 2]),
-            listdir(path.join(folderPath, setName, "F")[:count//2])
+            listdir(path.join(folderPath, setName, "T"))[:count//2 + count % 2],
+            listdir(path.join(folderPath, setName, "F"))[:count//2]
         )
 
     imgs = []
+    labels = []
 
     for setName, pool in imagePools.items():
-        print("Loading dataset %s" % setName)
+        print("Loading dataset %s of size %i" % (setName, len(pool[0])+len(pool[1])))
         for i in range(len(pool[0])):
             imgs.append(
-                Image.open(path.join(folderPath, setName, "T", pool[0][i]))
+                np.asarray(
+                    Image.open(path.join(folderPath, setName, "T", pool[0][i]))
+                )
             )
+            labels.append(True)
             if i < len(pool[1]):
                 imgs.append(
-                    Image.open(path.join(folderPath, setName, "F", pool[1][i]))
+                    np.asarray(
+                        Image.open(path.join(folderPath, setName, "F", pool[1][i]))
+                    )
                 )
+                labels.append(False)
 
     if shuffle:
         random.shuffle(imgs)
 
-    return imgs
+    return imgs, labels
 
+batchsize = 50
 def trainModel(x, modelTuple):
 
     print("Training model: %i" % x)
@@ -57,14 +107,13 @@ def trainModel(x, modelTuple):
     model.set_weights(weights)
 
     optimizer = optimizers.adam(lr=1e-4, decay=1e-6)
-    model.compile(loss='mean_squared_error', optimizer=optimizer, metrics=['accuracy'])
+    model.compile(loss='mean_squared_error', optimizer=optimizer, metrics=['accuracy', f1measure, f_half_measure, precision, recall])
 
     images, labels = loadImages()
 
-    metrics = model.train_on_batch(np.array(images), labels)  # TODO: look at class_weight and sample_weight
 
-    for i in range(len(metrics)):
-        print("%s: %s" % (model.metrics_names[i], metrics[i]))
+    model.fit(np.array(images), labels, batch_size=batchsize, epochs=1, verbose=1,   # TODO: JOAKIM: both 1 and 5
+              validation_split=0, shuffle=True)
 
     return 1, np.array(model.get_weights())
 
@@ -82,7 +131,7 @@ if __name__ == '__main__':
     conf = SparkConf().setAppName(theThing.__name__)
     sc = SparkContext(conf=conf)
 
-    for i in range(100):
+    for i in range(100):  # TODO: JOAKIM
 
         sharedModel = sc.broadcast((model.get_config(), model.get_weights()))
 
@@ -94,13 +143,9 @@ if __name__ == '__main__':
 
         finalWeights = combinedWeights / combinedCount
 
-        if True:  # Calculate the change from the average, so we can scale it up
+        if True:  # Calculate the change from the average, so we can scale it up # TODO: JOAKIM TRY FALSE
             deltaWeights = finalWeights - model.get_weights()
             finalWeights = model.get_weights() + deltaWeights*combinedCount
 
         model.set_weights(finalWeights)
-        model.save(modelFilename)
-
-        print("TRAINING TEMP ON MASTER!!!!!")
-        print(model.metrics_names)
-        trainModel(1337,(model.get_config(), model.get_weights()))
+        model.save(modelFilename+"_Special_Edition_Spark")
