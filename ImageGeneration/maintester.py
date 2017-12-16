@@ -3,6 +3,8 @@ from webbrowser import open
 import os, errno, platform
 import argparse
 import time
+import uuid
+from humanfriendly import format_timespan
 
 
 def main(save_root, innerloop, outterloop, size, max_noise, set_amount_of_noise, rotate_degrees,
@@ -17,20 +19,27 @@ def main(save_root, innerloop, outterloop, size, max_noise, set_amount_of_noise,
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise
+    try:
+        os.makedirs(os.path.join(save_root, "T"))
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
+    try:
+        os.makedirs(os.path.join(save_root, "F"))
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
 
-    counter = 0
-    counter = len(os.listdir(save_root)) + 1
-
-    start_amount_of_files = counter
     start_time = time.time()
 
     for u in range(0, outterloop):
+        new_time = time.time()
         print(f"Start itteration: {u + 1}")
 
         print(f"Start creation of images.")
         try:
             images, labels = Generator(tbgenerated=innerloop, max_noise = max_noise, set_amount_of_noise = set_amount_of_noise, rotate_degrees = rotate_degrees,
-              size_difference_noise = size_difference_noise, size_difference_license = size_difference_license,  wlicence = wlicence,
+              size_difference_noise = size_difference_noise, size_difference_license = size_difference_license,  wlicence = wlicense,
               nolicar = nolicar, nothing = nothing, size=size, blur = blur, rndom_noise = rndom_noise, blur_amount_random = blur_amount_random,
               noise_amount_random = noise_amount_random)
         except BaseException as e:
@@ -40,25 +49,26 @@ def main(save_root, innerloop, outterloop, size, max_noise, set_amount_of_noise,
         print(f"Generation end. Start saving process.")
         length = len(images)
         for x in range(0, len(images)):
-            savepath = save_shit(save_root, counter,labels[x])
+            savepath = save_shit(save_root, labels[x])
 
             images[x].save(savepath)
-            counter += 1
 
-        print(f"Images saved. In path: {save_root}")
+        print(f"Images saved. In path:      {save_root}\n"
+              f"Time for this iteration:    {format_timespan(time.time() - new_time)}")
+
     print(f"Generation completed!!!  Good job boiiii!"
-          f"The total generated images is:                           {innerloop * outterloop}"
-          f"The total images is:                                     {os.listdir(save_root) - start_amount_of_files + 1}"
-          f"If these does not add up.. Something went wrong."
-          f"Total amount of time it took to complete the generation: {time.time() - start_time}")
+          f"The total generated images is:                           {innerloop * outterloop}\n\n"
+          f"If these does not add up.. Something went wrong.\n\n"
+          f"Final time it took was: {format_timespan(time.time() - start_time)}")
 
 
-def save_shit(save_root, counter, label):
-    return os.path.join(save_root, "id{}_type{}.png".format(str(counter), label))
+def save_shit(save_root, label):
+    subfolder = str(label)[0]
+    return os.path.join(save_root, subfolder ,f"{str(uuid.uuid4())}.png")
 
 ap = argparse.ArgumentParser(description="Image generator.", epilog="Hem is a lollicon, Joakim er til traps and Maas er Hitler CONFIRMED!!")
 
-ap.add_argument("-in", "--innerloop", help="The inner loop of the function. Default is 50", type=int, default=50,
+ap.add_argument("-in", "--innerloop", help="The inner loop of the function. Default is 50", type=int, default=30,
                 nargs='?', const=1)
 ap.add_argument("-ou", "--outerloop", help="The outer loop of the function. Default is 100", type=int, default=100,
                 nargs='?', const=1)
@@ -83,12 +93,12 @@ ap.add_argument("-bl", "--blur", help="Chance of getting a blurred image. Defaul
 ap.add_argument("-rn", "--random_noise", help="Chance of getting random noise on the image. Default is .3", type=float, default=.3,
                 nargs='?', const=1)
 
-
+ap.add_argument("-rd", "--rotation", help="Defines the rotation degree. Inseret one integer, and it will be negated, eg: 5 creates a random degree between -5 and 5", type=int, default=5,
+                nargs='?', const=1)
 
 ap.add_argument("-si", "--size", help="Define the size of the image to be generated.",
                 type=str, default="512,512", nargs='?')
-ap.add_argument("-rd", "--rotation", help="Define the amount to be rotated. eg: -40,40.",
-                type=str, default="-30,30", nargs='?')
+
 ap.add_argument("-sdn", "--size_difference_noise", help="Define the amount the noise should be scaled. eg: 1.5,3.",
                 type=str, default="1.5,3", nargs='?')
 ap.add_argument("-sdl", "--size_difference_license", help="Define the amount the license should be scaled. eg: 1.5,3.",
@@ -106,21 +116,18 @@ try:
 except:
     raise argparse.ArgumentTypeError("Must be XXX,XXX")
 
-try:
-    x, y = args.rotation.split(',')
-    rotation = (int(x), int(y))
-except:
-    raise argparse.ArgumentTypeError("Must be XX,XX")
+passed_rotation = args.rotation
 
+rotation = (-1 * passed_rotation, passed_rotation)
 try:
     x, y = args.size_difference_noise.split(',')
-    size_difference_noise = (int(x), int(y))
+    size_difference_noise = (float(x), float(y))
 except:
     raise argparse.ArgumentTypeError("Must be XX,XX")
 
 try:
     x, y = args.size_difference_license.split(',')
-    size_difference_license = (int(x), int(y))
+    size_difference_license = (float(x), float(y))
 except:
     raise argparse.ArgumentTypeError("Must be XX,XX")
 
@@ -144,7 +151,7 @@ main(save_root=args.savefolder, innerloop=args.innerloop, outterloop=args.outerl
      rotate_degrees = rotation, size_difference_noise = size_difference_noise,
      size_difference_license = size_difference_license, wlicense = args.wlicense,
      nolicar = args.nolicar, nothing = args.nothing, blur = args.blur,
-     rndom_noise = args.rndom_noise, blur_amount_random = blur_amount_random,
+     rndom_noise = args.random_noise, blur_amount_random = blur_amount_random,
      noise_amount_random = noise_amount_random)
 
 
