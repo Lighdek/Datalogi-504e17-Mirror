@@ -13,7 +13,7 @@ from KerasModel import StrideConvolutionalNetwork as theThing
 from pyspark import SparkContext, SparkConf
 
 modelExt = ".hem"
-modelFilename = os.path.join(*theThing.__name__.split('.')) + modelExt
+modelFilename = os.path.join('/home/user', *theThing.__name__.split('.')) + modelExt
 print(modelFilename)
 
 
