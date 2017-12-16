@@ -1,10 +1,7 @@
 from ImageGeneration.Generator import Generator
 from webbrowser import open
-import os, errno, platform
-import argparse
-import time
-import uuid
 from humanfriendly import format_timespan
+import os, errno, platform, uuid, time, argparse
 
 
 def main(save_root, innerloop, outterloop, size, max_noise, set_amount_of_noise, rotate_degrees,
