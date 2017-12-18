@@ -98,10 +98,10 @@ def image_manipulationsss(fg, bgsize, sd):
     scale = min(bgsize[0] / random.uniform(sd[0], sd[1]) / fg.size[0],
                 bgsize[1] / random.uniform(sd[0], sd[1]) / fg.size[1])
 
-    noise = fg.resize((int(fg.size[0] * scale), int(fg.size[1] * scale)), Image.ANTIALIAS)
+    fg = fg.resize((int(fg.size[0] * scale), int(fg.size[1] * scale)), Image.ANTIALIAS)
 
-    offset = (random.randint(0, bgsize[0] - noise.size[0]),
-              random.randint(0, bgsize[1] - noise.size[1]))
+    offset = (random.randint(0, bgsize[0] - fg.size[0]),
+              random.randint(0, bgsize[1] - fg.size[1]))
     return fg, offset
 
 
