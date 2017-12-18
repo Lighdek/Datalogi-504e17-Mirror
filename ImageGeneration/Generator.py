@@ -50,7 +50,7 @@ def Generator(tbgenerated=1, max_noise = 4, set_amount_of_noise = False, rotate_
     for x in range(0, tbgenerated):
         noises = []
 
-        chocen_license_plate = filepath["licenseplates"][random.randint(0, len(filepath["licenseplates"]) - 1 )]
+        chocen_license_plate = Image.open(filepath["licenseplates"][random.randint(0, len(filepath["licenseplates"]) - 1 )])
         background = Image.open(join(background_root,filepath["backgrounds"][random.randint(0, len(filepath["backgrounds"])- 1)]))
 
         has_licence_plate = True if random.random() < wlicence else False
