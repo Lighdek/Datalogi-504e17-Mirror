@@ -112,9 +112,12 @@ def trainModel(x, modelTuple):
 
     images, labels = loadImages()
 
+    callback = keras.callbacks.TensorBoard(log_dir='./logs', histogram_freq=0, batch_size=batchsize,
+                                           write_graph=True, write_grads=True, write_images=True, embeddings_freq=0,
+                                           embeddings_layer_names=None, embeddings_metadata=None, )
 
     model.fit(np.array(images), labels, batch_size=batchsize, epochs=1, verbose=1,   # TODO: JOAKIM: both 1 and 5
-              validation_split=0, shuffle=True)
+              validation_split=0, shuffle=True, callbacks=[callback])
 
     return 1, np.array(model.get_weights())
 
