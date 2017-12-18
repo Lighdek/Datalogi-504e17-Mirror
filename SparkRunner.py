@@ -93,7 +93,8 @@ def loadImages(datasets: list=None, shuffle: bool=True, folderPath: str="/home/u
                 labels.append(False)
 
     if shuffle:
-        random.shuffle(imgs)
+        #random.shuffle(imgs) #BROKEN
+        pass
 
     return imgs, labels
 
