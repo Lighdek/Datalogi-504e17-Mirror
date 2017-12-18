@@ -7,26 +7,26 @@ import metrics as m
 def init():
     model = Sequential([
 
-        Conv2D(filters=12, kernel_size=3, activation='relu', padding='same', input_shape=(512, 512, 3),
-               kernel_regularizer=reg.l2(0.)),
+        Conv2D(filters=16, kernel_size=3, activation='relu', padding='same', input_shape=(128, 128, 3),
+               kernel_regularizer=reg.l2(0.5)),
         MaxPool2D(padding='same'),  # 256
 
-        Conv2D(filters=16, kernel_size=3, activation='relu', padding='same', kernel_regularizer=reg.l2(0.)),
+        Conv2D(filters=32, kernel_size=3, activation='relu', padding='same', kernel_regularizer=reg.l2(0.9)),
         MaxPool2D(padding='same'),  # 128
 
-        Conv2D(filters=16, kernel_size=3, activation='relu', padding='same', kernel_regularizer=reg.l2(0.)),
+        Conv2D(filters=64, kernel_size=3, activation='relu', padding='same', kernel_regularizer=reg.l2(0.9)),
         MaxPool2D(padding='same'),  # 64
 
-        Conv2D(filters=16, kernel_size=3, activation='relu', padding='same', kernel_regularizer=reg.l2(0.)),
+        Conv2D(filters=128, kernel_size=3, activation='relu', padding='same', kernel_regularizer=reg.l2(0.9)),
         MaxPool2D(padding='same'),  # 32
 
-        Conv2D(filters=16, kernel_size=3, activation='relu', padding='same', kernel_regularizer=reg.l2(0.)),
+        Conv2D(filters=128, kernel_size=3, activation='relu', padding='same', kernel_regularizer=reg.l2(0.9)),
         MaxPool2D(padding='same'),  # 16
 
-        Conv2D(filters=16, kernel_size=3, activation='relu', padding='same', kernel_regularizer=reg.l2(0.)),
+        Conv2D(filters=128, kernel_size=3, activation='relu', padding='same', kernel_regularizer=reg.l2(0.9)),
         MaxPool2D(padding='same'),  # 8
 
-        Conv2D(filters=16, kernel_size=3, activation='relu', padding='same', kernel_regularizer=reg.l2(0.)),
+        Conv2D(filters=128, kernel_size=3, activation='relu', padding='same', kernel_regularizer=reg.l2(0.1)),
         MaxPool2D(padding='same', pool_size=8),  # 4
 
         #Conv2D(filters=16, kernel_size=3, activation='relu', padding='same', kernel_regularizer=reg.l2(0.)),
@@ -35,7 +35,8 @@ def init():
         #Conv2D(filters=16, kernel_size=3, activation='relu', padding='same', kernel_regularizer=reg.l2(0.)),
         #MaxPool2D(padding='same'),  # 1
 
-        Flatten(input_shape=(1, 1, None)),
+        Flatten(input_shape=(1, 1, 128)),
+        Dense(64, activation='relu'),
         Dense(1, activation='sigmoid')
 
     ])

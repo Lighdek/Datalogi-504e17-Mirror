@@ -18,11 +18,11 @@ if __name__ == '__main__':
                                                                        'recall': m.recall})
     except OSError as e:
         print(e)
-        model = theThing.init()
+    model = theThing.init()
 
     model.summary()
 
-    model.set_weights(model.get_weights()/2)
+    #model.set_weights(np.array(model.get_weights())/2)
 
     callback = keras.callbacks.TensorBoard(log_dir='./logs', histogram_freq=0, batch_size=batchsize,
                                            write_graph=True, write_grads=True, write_images=True, embeddings_freq=0,
@@ -30,10 +30,11 @@ if __name__ == '__main__':
 
     #images, labels = ImageLoader.loadImagesOld(count=5000) #ImageGenerator.Generator(200)
 
-    images, labels = ImageLoader.loadImages(datasets = [(19400, 'GenLicenseOnBackground')])
-
-    model.fit(np.array(images), labels, batch_size=batchsize, epochs=100, verbose=1,
-              validation_split=0.10, shuffle=True, callbacks=[callback])
+    images, labels = ImageLoader.loadImages(datasets = [(2055, 'SmallSet')])
+    #2055
+    print(images[0])
+    model.fit(images, labels, batch_size=batchsize, epochs=100, verbose=1,
+                  validation_split=0.10, shuffle=True, callbacks=[callback])
 
     #model.evaluate(np.array(images), labels, batch_size=50, verbose=1)
 

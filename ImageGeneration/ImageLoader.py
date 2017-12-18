@@ -20,6 +20,10 @@ def loadImages(datasets: list=None, shuffle: bool=True, folderPath: str="OurImag
             listdir(path.join(folderPath, setName, "T"))[:count//2 + count % 2],
             listdir(path.join(folderPath, setName, "F"))[:count//2]
         )
+        #random.shuffle(imagePools[setName][0])
+        #random.shuffle(imagePools[setName][1])
+        #imagePools[setName] = (imagePools[setName][0][:count//2 + count % 2]
+        # ,imagePools[setName][1][:count//2])
 
     imgs = []
     labels = []
@@ -32,19 +36,21 @@ def loadImages(datasets: list=None, shuffle: bool=True, folderPath: str="OurImag
                     Image.open(path.join(folderPath, setName, "T", pool[0][i]))
                 )
             )
-            labels.append(True)
+            labels.append(1.0)
             if i < len(pool[1]):
                 imgs.append(
                     np.asarray(
                         Image.open(path.join(folderPath, setName, "F", pool[1][i]))
                     )
                 )
-                labels.append(False)
+                labels.append(0.0)
 
     if shuffle:
-        random.shuffle(imgs)
+        #random.shuffle(imgs)
+        pass
 
-    return np.array(imgs)/255, labels
+    print(np.array(labels))
+    return np.asarray(imgs), np.asarray(labels)
 
 
 folderPathOld = "OurImages/512_512/"
