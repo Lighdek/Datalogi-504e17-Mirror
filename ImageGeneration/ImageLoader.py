@@ -10,7 +10,7 @@ from os import path, listdir
 def loadImages(datasets: list=None, shuffle: bool=True, folderPath: str="OurImages/") -> list:
     if datasets is None:
         datasets = [
-            (100, 'RealFrontBack'),
+            #(100, 'RealFrontBack'),
             (100, 'GenLicenseOnBackground')
         ]
 
@@ -44,7 +44,7 @@ def loadImages(datasets: list=None, shuffle: bool=True, folderPath: str="OurImag
     if shuffle:
         random.shuffle(imgs)
 
-    return imgs, labels
+    return np.array(imgs)/255, labels
 
 
 folderPathOld = "OurImages/512_512/"

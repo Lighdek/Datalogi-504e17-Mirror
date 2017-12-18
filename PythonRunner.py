@@ -22,13 +22,15 @@ if __name__ == '__main__':
 
     model.summary()
 
+    model.set_weights(model.get_weights()/2)
+
     callback = keras.callbacks.TensorBoard(log_dir='./logs', histogram_freq=0, batch_size=batchsize,
                                            write_graph=True, write_grads=True, write_images=True, embeddings_freq=0,
                                            embeddings_layer_names=None, embeddings_metadata=None, )
 
     #images, labels = ImageLoader.loadImagesOld(count=5000) #ImageGenerator.Generator(200)
 
-    images, labels = ImageLoader.loadImages(datasets = [(1200, 'RealFrontBack'), (19400, 'GenLicenseOnBackground')])
+    images, labels = ImageLoader.loadImages(datasets = [(19400, 'GenLicenseOnBackground')])
 
     model.fit(np.array(images), labels, batch_size=batchsize, epochs=100, verbose=1,
               validation_split=0.10, shuffle=True, callbacks=[callback])
