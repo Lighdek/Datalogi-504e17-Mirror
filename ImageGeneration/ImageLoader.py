@@ -7,7 +7,7 @@ import numpy as np
 from os import path, listdir
 
 
-def loadImages(datasets: list=None, shuffle: bool=True, folderPath: str="OurImages/") -> list:
+def loadImages(datasets: list=None, folderPath: str="OurImages/") -> tuple:
     if datasets is None:
         datasets = [
             (100, 'RealFrontBack'),
@@ -17,27 +17,35 @@ def loadImages(datasets: list=None, shuffle: bool=True, folderPath: str="OurImag
     imagePools = {}
     for (count, setName) in datasets:
         imagePools[setName] = (
-            listdir(path.join(folderPath, setName, "T")[:count//2 + count % 2]),
-            listdir(path.join(folderPath, setName, "F")[:count//2])
+            listdir(path.join(folderPath, setName, "T"))[:count//2 + count % 2],
+            listdir(path.join(folderPath, setName, "F"))[:count//2]
         )
+        #random.shuffle(imagePools[setName][0])
+        #random.shuffle(imagePools[setName][1])
+        #imagePools[setName] = (imagePools[setName][0][:count//2 + count % 2]
+        # ,imagePools[setName][1][:count//2])
 
     imgs = []
+    labels = []
 
     for setName, pool in imagePools.items():
-        print("Loading dataset %s" % setName)
+        print("Loading dataset %s of size %i" % (setName, len(pool[0])+len(pool[1])))
         for i in range(len(pool[0])):
             imgs.append(
-                Image.open(path.join(folderPath, setName, "T", pool[0][i]))
+                np.asarray(
+                    Image.open(path.join(folderPath, setName, "T", pool[0][i])).resize((512, 512))
+                )
             )
+            labels.append([1,0])
             if i < len(pool[1]):
                 imgs.append(
-                    Image.open(path.join(folderPath, setName, "F", pool[1][i]))
+                    np.asarray(
+                        Image.open(path.join(folderPath, setName, "F", pool[1][i])).resize((512, 512))
+                    )
                 )
+                labels.append([0,1])
 
-    if shuffle:
-        random.shuffle(imgs)
-
-    return imgs
+    return np.array(imgs), np.array(labels)
 
 
 folderPathOld = "OurImages/512_512/"
@@ -49,7 +57,7 @@ def loadImagesOld(count=200, shano=False):
     if count < 1:
         raise ValueError("Tried to load 0 images")
     if len(files) < 1:
-        raise OSError("No images in folder %s " % folderPath)
+        raise OSError("No images in folder %s " % folderPathOld)
 
     if shano:
         with open("OurImages/plateScanner/DhatPlate.pickle", "rb") as fil:
