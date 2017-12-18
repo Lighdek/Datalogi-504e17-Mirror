@@ -36,14 +36,14 @@ def loadImages(datasets: list=None, folderPath: str="OurImages/") -> tuple:
                     Image.open(path.join(folderPath, setName, "T", pool[0][i])).resize((512, 512))
                 )
             )
-            labels.append([1,0])
+            labels.append(True)
             if i < len(pool[1]):
                 imgs.append(
                     np.asarray(
                         Image.open(path.join(folderPath, setName, "F", pool[1][i])).resize((512, 512))
                     )
                 )
-                labels.append([0,1])
+                labels.append(False)
 
     return np.array(imgs), np.array(labels)
 

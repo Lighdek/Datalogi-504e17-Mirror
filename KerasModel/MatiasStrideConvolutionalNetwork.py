@@ -35,7 +35,7 @@ def init():
 
         Dense(200, activation='tanh', kernel_regularizer=regularizers.l2(0.)),
 
-        Dense(2, activation='softmax', )
+        Dense(1, activation='hard_sigmoid')
     ])
 
     optimizer = optimizers.adam(lr=1e-4, decay=1e-6)
