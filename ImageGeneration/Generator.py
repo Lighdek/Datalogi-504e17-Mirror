@@ -50,7 +50,7 @@ def Generator(tbgenerated=1, max_noise = 4, set_amount_of_noise = False, rotate_
     for x in range(0, tbgenerated):
         noises = []
 
-        chocen_license_plate = Image.open(filepath["licenseplates"][random.randint(0, len(filepath["licenseplates"]) - 1 )])
+        chocen_license_plate = Image.open(join(licence_plate_root, filepath["licenseplates"][random.randint(0, len(filepath["licenseplates"]) - 1 )]))
         background = Image.open(join(background_root,filepath["backgrounds"][random.randint(0, len(filepath["backgrounds"])- 1)]))
 
         has_licence_plate = True if random.random() < wlicence else False
@@ -108,7 +108,8 @@ def image_manipulationsss(fg, bgsize, sd):
 def apply_filter(image, blur, rndom_noise, blur_amount_random, noise_amount_random):
     choice = random.random()
     if choice < blur:
-        image = image.filter(ImageFilter.GaussianBlur(radius=(random.randint(blur_amount_random[0],blur_amount_random[1]))))
+        pass
+        #image = image.filter(ImageFilter.GaussianBlur(radius=(random.randint(blur_amount_random[0],blur_amount_random[1]))))
     elif choice < blur + rndom_noise:
         image = randomNoise(image, random.randint(noise_amount_random[0], noise_amount_random[1]))
 

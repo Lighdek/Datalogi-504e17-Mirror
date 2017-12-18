@@ -1,4 +1,4 @@
-from .Generator import Generator
+from Generator import Generator
 from webbrowser import open
 from humanfriendly import format_timespan
 import os, errno, platform, uuid, time, argparse
@@ -53,9 +53,9 @@ def main(save_root, innerloop, outterloop, size, max_noise, set_amount_of_noise,
         print(f"Images saved. In path:      {save_root}\n"
               f"Time for this iteration:    {format_timespan(time.time() - new_time)}")
 
-    print(f"Generation completed!!!  Good job boiiii!"
+    print(f"Generation completed!!!  Good job boiiii!\n"
           f"The total generated images is:                           {innerloop * outterloop}\n\n"
-          f"If these does not add up.. Something went wrong.\n\n"
+          
           f"Final time it took was: {format_timespan(time.time() - start_time)}")
 
 
