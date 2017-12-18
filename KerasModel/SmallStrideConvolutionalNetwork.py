@@ -8,15 +8,15 @@ def init():
     model = Sequential([
 
         Conv2D(filters=16, kernel_size=16, strides=4, activation='relu', padding='same', input_shape=(512, 512, 3),
-               kernel_regularizer=reg.l2(0.)), # 256
+               kernel_regularizer=reg.l2(0.01)), # 256
 
-        Conv2D(filters=64, kernel_size=8, strides=4, activation='relu', padding='same', kernel_regularizer=reg.l2(0.)),# 64
+        Conv2D(filters=64, kernel_size=8, strides=4, activation='relu', padding='same', kernel_regularizer=reg.l2(0.01)),# 64
 
-        Conv2D(filters=96, kernel_size=8, strides=4, activation='relu', padding='same', kernel_regularizer=reg.l2(0.)),# 16
+        Conv2D(filters=96, kernel_size=8, strides=4, activation='relu', padding='same', kernel_regularizer=reg.l2(0.01)),# 16
 
-        Conv2D(filters=6, kernel_size=4, strides=4, activation='relu', padding='same', kernel_regularizer=reg.l2(0.)),# 4
+        Conv2D(filters=6, kernel_size=4, strides=4, activation='relu', padding='same', kernel_regularizer=reg.l2(0.01)),# 4
 
-        Dense(100, activation="tanh", kernel_regularizer=reg.l2(0.2)),
+        Dense(100, activation="tanh", kernel_regularizer=reg.l2(0.01)),
 
         Flatten(input_shape=(1, 1, None)),
         Dense(2, activation='softmax')

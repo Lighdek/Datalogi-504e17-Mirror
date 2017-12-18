@@ -1,9 +1,8 @@
 import keras
 import os
 import metrics as m
-import random
 from ImageGeneration import ImageLoader
-from KerasModel import MatiasStrideConvolutionalNetwork as theThing
+from KerasModel import Log2ConvolutionalNetwork as theThing
 
 modelExt = ".hem"
 testExt = "1x"
@@ -31,7 +30,7 @@ if __name__ == '__main__':
 
     images, labels = ImageLoader.loadImages(datasets = [(1100, 'RealFrontBack'), (8900, 'GenLicenseOnBackground')])
 
-    model.fit(images, labels, batch_size=batchsize, epochs=100, verbose=1,
+    model.fit(images, labels, batch_size=batchsize, epochs=20, verbose=1,
               validation_split=0.10, shuffle=True, callbacks=[callback])
 
     #scores = model.evaluate(images, labels, batch_size=50, verbose=1)
