@@ -19,7 +19,7 @@ def init():
         Dense(100, activation="tanh", kernel_regularizer=reg.l2(0.2)),
 
         Flatten(input_shape=(1, 1, None)),
-        Dense(1, activation='hard_sigmoid')
+        Dense(2, activation='softmax')
 
     ])
 
