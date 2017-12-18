@@ -16,11 +16,18 @@ Please note that these ONLY include shit you have to download on the side....
     <dd><em>pip install pillow</em></dd>
     <dd>Pillow eller PIL bliver brugt til at få filformatet "Images"
 <dt>numpy</dt>
-    <dd><em>pip install numby</em></dd>
+    <dd><em>pip install numpy</em></dd>
     <dd>numby bliver brugt til at konveretere billeder til deres bestandele i pixels, dvs et 3 dim array </dd>
 <dt>pygame</dt>
     <dd><em>pip install pygame</em></dd>
     <dd>pygame, bliver brugt til at tegne billeder og er en nem måde at få events som keydown osv.</dd>
+<dt>pygame</dt>
+    <dd><em>pip install humanfriendly</em></dd>
+    <dd>Bliver brugt i generatoren til at vise tid ordenligt.</dd>
+<dt>pygame</dt>
+    <dd><em>pip install opencv-python</em></dd>
+    <dd>Bliver brugt til at lave noget billedmanipulation.</dd>
+
 
 
 
