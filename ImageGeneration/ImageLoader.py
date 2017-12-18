@@ -7,7 +7,7 @@ import numpy as np
 from os import path, listdir
 
 
-def loadImages(datasets: list=None, shuffle: bool=True, folderPath: str="OurImages/") -> list:
+def loadImages(datasets: list=None, folderPath: str="OurImages/") -> list:
     if datasets is None:
         datasets = [
             (100, 'RealFrontBack'),
@@ -29,22 +29,19 @@ def loadImages(datasets: list=None, shuffle: bool=True, folderPath: str="OurImag
         for i in range(len(pool[0])):
             imgs.append(
                 np.asarray(
-                    Image.open(path.join(folderPath, setName, "T", pool[0][i]))
+                    Image.open(path.join(folderPath, setName, "T", pool[0][i])).resize((512, 512))
                 )
             )
-            labels.append(True)
+            labels.append([1,0])
             if i < len(pool[1]):
                 imgs.append(
                     np.asarray(
-                        Image.open(path.join(folderPath, setName, "F", pool[1][i]))
+                        Image.open(path.join(folderPath, setName, "F", pool[1][i])).resize((512, 512))
                     )
                 )
-                labels.append(False)
+                labels.append([0,1])
 
-    if shuffle:
-        random.shuffle(imgs)
-
-    return imgs, labels
+    return np.array(imgs), np.array(labels)
 
 
 folderPathOld = "OurImages/512_512/"
