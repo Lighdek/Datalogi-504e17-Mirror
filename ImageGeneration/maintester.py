@@ -1,4 +1,4 @@
-from ImageGeneration.Generator import Generator
+from .Generator import Generator
 from webbrowser import open
 import os, errno, platform
 import argparse

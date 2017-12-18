@@ -19,3 +19,5 @@ print(timeit.timeit('kim()',setup="from __main__ import kim", number=10))
 #print(timeit.timeit('stupidtest3()',setup="from __main__ import stupidtest3", number=1))
 
 #print("That's it ladies and gents. Trhanks for tonight. Hope you die just as awfully as I did performing these tests.")
+
+
