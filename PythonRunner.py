@@ -27,11 +27,11 @@ if __name__ == '__main__':
 
     callback = keras.callbacks.CSVLogger("logs/SparkEquivalent", append=True)
 
-    for i in range(20):
-        images, labels = ImageLoader.loadImages(datasets = [(1320, 'GenLicenseOnBackground')])
+    for i in range(50):
+        images, labels = ImageLoader.loadImages(datasets = [(4200, 'GenLicenseOnBackground')]) #35*2*48/.8
 
         model.fit(images, labels, batch_size=batchsize, epochs=1, verbose=1,
-              validation_split=0.10, shuffle=True, callbacks=[callback])
+              validation_split=0.20, shuffle=True, callbacks=[callback])
 
     #model.evaluate(np.array(images), labels, batch_size=50, verbose=1)
 

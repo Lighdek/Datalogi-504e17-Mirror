@@ -11,6 +11,7 @@ from os import path, listdir
 from KerasModel import Log2ConvolutionalNetwork as theThing
 
 from pyspark import SparkContext, SparkConf
+import tensorflow as tf
 
 ### Start metrics
 
@@ -124,16 +125,16 @@ def trainModel(x, modelTuple):
     optimizer = optimizers.adam(lr=1e-4, decay=1e-6)
     model.compile(loss='mean_squared_error', optimizer=optimizer, metrics=['accuracy', f1measure, f_half_measure, precision, recall])
 
-    images, labels = loadImages([(50 ,"GenLicenseOnBackground")])
+    images, labels = loadImages([(70 ,"GenLicenseOnBackground")])
 
     #callback = keras.callbacks.TensorBoard(log_dir='./logs', histogram_freq=0, batch_size=batchsize,
     #                                       write_graph=True, write_grads=True, write_images=True, embeddings_freq=0,
     #                                       embeddings_layer_names=None, embeddings_metadata=None, )
 
-    callback = keras.callbacks.CSVLogger("/home/user/logs/"+runName, append=True)
+    #callback = keras.callbacks.CSVLogger("/home/user/logs/"+runName, append=True)
 
     model.fit(np.array(images), labels, batch_size=batchsize, epochs=runEpochs, verbose=1,
-              validation_split=0.3, shuffle=True, callbacks=[callback])
+              validation_split=0.0, shuffle=True)#, callbacks=[callback])
 
     return 1, np.array(model.get_weights())
 
@@ -150,9 +151,10 @@ def main():
     conf = SparkConf().setAppName(theThing.__name__)
     sc = SparkContext(conf=conf)
 
-    assert (20//runEpochs)*runEpochs == 20
+    assert (50//runEpochs)*runEpochs == 50
 
-    for i in range(20//runEpochs):
+    writer = tf.summary.FileWriter("/home/user/logs")
+    for i in range(50//runEpochs):
 
         sharedModel = sc.broadcast((model.get_config(), model.get_weights()))
 
@@ -175,6 +177,14 @@ def main():
 
         model.set_weights(finalWeights)
         model.save(modelFilename)
+
+        images, labels = loadImages([(100, "GenLicenseOnBackground")])
+        summary = model.evaluate(images, labels, batch_size=100)
+
+        summaries = tf.Summary(value=[
+            tf.Summary.Value(tag=model.metrics_names[x], simple_value=summary[x]) for x in range(len(model.metrics_names))
+        ])
+        writer.add_summary(summaries)
 
 
 if __name__ == '__main__':
