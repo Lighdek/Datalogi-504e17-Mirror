@@ -153,7 +153,7 @@ def main():
 
     assert (50//runEpochs)*runEpochs == 50
 
-    writer = tf.summary.FileWriter("/home/user/logs")
+    writer = tf.summary.FileWriter("/home/user/logs/"+runName)
     for i in range(50//runEpochs):
 
         sharedModel = sc.broadcast((model.get_config(), model.get_weights()))
