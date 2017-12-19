@@ -12,11 +12,6 @@ from KerasModel import StrideConvolutionalNetwork as theThing
 
 from pyspark import SparkContext, SparkConf
 
-modelExt = ".hem"
-modelFilename = os.path.join('/home/user', *theThing.__name__.split('.')) + modelExt
-print(modelFilename)
-
-
 ### Start metrics
 
 from keras import backend as K
@@ -67,9 +62,17 @@ def loadImages(datasets: list=None, shuffle: bool=True, folderPath: str="/home/u
 
     imagePools = {}
     for (count, setName) in datasets:
+        dirT = listdir(path.join(folderPath, setName, "T"))
+        dirF = listdir(path.join(folderPath, setName, "F"))
+
+        if shuffle:
+            random.shuffle(dirT)
+            random.shuffle(dirF)
+
+
         imagePools[setName] = (
-            listdir(path.join(folderPath, setName, "T"))[:count//2 + count % 2],
-            listdir(path.join(folderPath, setName, "F"))[:count//2]
+            dirT[:count//2 + count % 2],
+            dirF[:count//2]
         )
 
     imgs = []
@@ -92,13 +95,25 @@ def loadImages(datasets: list=None, shuffle: bool=True, folderPath: str="/home/u
                 )
                 labels.append(False)
 
-    if shuffle:
-        #random.shuffle(imgs) #BROKEN
-        pass
-
     return imgs, labels
 
-batchsize = 50
+    #mode   name,           epochs
+    #0      "Average")      1
+    #1      "Scale")        1
+    #2      "DecayingScale" 1
+    #0      "Average5Epoch" 5
+
+
+runName="Average"
+runMode=0
+runEpochs=1
+modelExt = ".hem"
+modelFilename = os.path.join('/home/user', *theThing.__name__.split('.')) + modelExt
+print(modelFilename)
+
+batchsize = 35
+
+
 def trainModel(x, modelTuple):
 
     print("Training model: %i" % x)
@@ -110,36 +125,39 @@ def trainModel(x, modelTuple):
     optimizer = optimizers.adam(lr=1e-4, decay=1e-6)
     model.compile(loss='mean_squared_error', optimizer=optimizer, metrics=['accuracy', f1measure, f_half_measure, precision, recall])
 
-    images, labels = loadImages()
+    images, labels = loadImages([(50 ,"GenLicenseOnBackground")])
 
-    callback = keras.callbacks.TensorBoard(log_dir='./logs', histogram_freq=0, batch_size=batchsize,
-                                           write_graph=True, write_grads=True, write_images=True, embeddings_freq=0,
-                                           embeddings_layer_names=None, embeddings_metadata=None, )
+    #callback = keras.callbacks.TensorBoard(log_dir='./logs', histogram_freq=0, batch_size=batchsize,
+    #                                       write_graph=True, write_grads=True, write_images=True, embeddings_freq=0,
+    #                                       embeddings_layer_names=None, embeddings_metadata=None, )
 
-    model.fit(np.array(images), labels, batch_size=batchsize, epochs=1, verbose=1,   # TODO: JOAKIM: both 1 and 5
-              validation_split=0, shuffle=True, callbacks=[callback])
+    callback = keras.callbacks.CSVLogger("/home/user/logs/"+runName, append=True)
+
+    model.fit(np.array(images), labels, batch_size=batchsize, epochs=runEpochs, verbose=1,
+              validation_split=0.3, shuffle=True, callbacks=[callback])
 
     return 1, np.array(model.get_weights())
 
 
-if __name__ == '__main__':
-
-    try:
-        model = keras.models.load_model(modelFilename)
-    except OSError as e:
-        print(e)
-        model = theThing.init()
+def main(mode=0):
+    #try:
+    #    model = keras.models.load_model(modelFilename)
+    #except OSError as e:
+    #   print(e)
+    model = theThing.init()
 
     model.summary()
 
     conf = SparkConf().setAppName(theThing.__name__)
     sc = SparkContext(conf=conf)
 
-    for i in range(100):  # TODO: JOAKIM
+    assert (25//runEpochs)*runEpochs == 25
+
+    for i in range(25//runEpochs):
 
         sharedModel = sc.broadcast((model.get_config(), model.get_weights()))
 
-        taskDummy = sc.parallelize(range(56))
+        taskDummy = sc.parallelize(range(48))
 
         changedWeights = taskDummy.map(lambda x: trainModel(x, sharedModel.value))
 
@@ -147,9 +165,18 @@ if __name__ == '__main__':
 
         finalWeights = combinedWeights / combinedCount
 
-        if True:  # Calculate the change from the average, so we can scale it up # TODO: JOAKIM TRY FALSE
-            deltaWeights = finalWeights - model.get_weights()
-            finalWeights = model.get_weights() + deltaWeights*combinedCount
+        if mode == 1:  # Calculate the change from the average, so we can scale it up
+            originalWeights = np.array(model.get_weights())
+            deltaWeights = finalWeights - originalWeights
+            finalWeights = originalWeights + deltaWeights * combinedCount
+        elif mode == 2: # Some decay of the scaled average
+            originalWeights = np.array(model.get_weights())
+            deltaWeights = finalWeights - originalWeights
+            finalWeights = originalWeights + deltaWeights * (combinedCount / i)
 
         model.set_weights(finalWeights)
-        model.save(modelFilename+"_Special_Edition_Spark")
+        model.save(modelFilename+runName)
+
+
+if __name__ == '__main__':
+    main(runMode)
