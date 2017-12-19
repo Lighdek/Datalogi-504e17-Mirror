@@ -7,7 +7,7 @@ import numpy as np
 from os import path, listdir
 
 
-def loadImages(datasets: list=None, shuffle: bool=True, folderPath: str="/home/user/OurImages/") -> tuple:
+def loadImages(datasets: list=None, shuffle: bool=True, folderPath: str="OurImages/") -> tuple:
     if datasets is None:
         datasets = [
             #(100, 'RealFrontBack'),

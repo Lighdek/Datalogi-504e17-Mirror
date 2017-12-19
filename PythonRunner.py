@@ -33,4 +33,4 @@ if __name__ == '__main__':
 
     #model.evaluate(np.array(images), labels, batch_size=50, verbose=1)
 
-    model.save(modelFilename+"_Special_Edition")
+    model.save(modelFilename+"SparkEquivalent")
