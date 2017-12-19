@@ -21,9 +21,11 @@ if __name__ == '__main__':
 
     model.summary()
 
-    callback = keras.callbacks.TensorBoard(log_dir='./logs', histogram_freq=0, batch_size=batchsize,
-                                           write_graph=True, write_grads=True, write_images=True, embeddings_freq=0,
-                                           embeddings_layer_names=None, embeddings_metadata=None, )
+    #callback = keras.callbacks.TensorBoard(log_dir='./logs', histogram_freq=0, batch_size=batchsize,
+    #                                       write_graph=True, write_grads=True, write_images=True, embeddings_freq=0,
+    #                                       embeddings_layer_names=None, embeddings_metadata=None, )
+
+    callback = keras.callbacks.CSVLogger("logs/SparkEquivalent", append=True)
 
     for i in range(20):
         images, labels = ImageLoader.loadImages(datasets = [(1320, 'GenLicenseOnBackground')])
