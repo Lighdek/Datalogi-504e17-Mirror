@@ -8,7 +8,7 @@ from PIL import Image
 from keras import optimizers
 from os import path, listdir
 
-from KerasModel import StrideConvolutionalNetwork as theThing
+from KerasModel import Log2ConvolutionalNetwork as theThing
 
 from pyspark import SparkContext, SparkConf
 
@@ -57,7 +57,7 @@ def loadImages(datasets: list=None, shuffle: bool=True, folderPath: str="/home/u
     if datasets is None:
         datasets = [
             #(100, 'RealFrontBack'),
-            (2800, 'GenLicenseOnBackground')
+            (50, 'GenLicenseOnBackground')
         ]
 
     imagePools = {}
@@ -68,7 +68,6 @@ def loadImages(datasets: list=None, shuffle: bool=True, folderPath: str="/home/u
         if shuffle:
             random.shuffle(dirT)
             random.shuffle(dirF)
-
 
         imagePools[setName] = (
             dirT[:count//2 + count % 2],
@@ -83,25 +82,25 @@ def loadImages(datasets: list=None, shuffle: bool=True, folderPath: str="/home/u
         for i in range(len(pool[0])):
             imgs.append(
                 np.asarray(
-                    Image.open(path.join(folderPath, setName, "T", pool[0][i]))
+                    Image.open(path.join(folderPath, setName, "T", pool[0][i])).resize((512, 512))
                 )
             )
             labels.append(True)
             if i < len(pool[1]):
                 imgs.append(
                     np.asarray(
-                        Image.open(path.join(folderPath, setName, "F", pool[1][i]))
+                        Image.open(path.join(folderPath, setName, "F", pool[1][i])).resize((512, 512))
                     )
                 )
                 labels.append(False)
 
-    return imgs, labels
+    return np.array(imgs), np.array(labels)
 
     #mode   name,           epochs
     #0      "Average")      1
     #1      "Scale")        1
     #2      "DecayingScale" 1
-    #0      "Average5Epoch" 5
+    #0      "Average5Epoch" 4
 
 
 runName="Average"
@@ -151,9 +150,9 @@ def main():
     conf = SparkConf().setAppName(theThing.__name__)
     sc = SparkContext(conf=conf)
 
-    assert (25//runEpochs)*runEpochs == 25
+    assert (20//runEpochs)*runEpochs == 20
 
-    for i in range(25//runEpochs):
+    for i in range(20//runEpochs):
 
         sharedModel = sc.broadcast((model.get_config(), model.get_weights()))
 

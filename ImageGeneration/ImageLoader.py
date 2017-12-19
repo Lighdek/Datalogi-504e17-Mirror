@@ -11,14 +11,21 @@ def loadImages(datasets: list=None, shuffle: bool=True, folderPath: str="/home/u
     if datasets is None:
         datasets = [
             #(100, 'RealFrontBack'),
-            (2800, 'GenLicenseOnBackground')
+            (50, 'GenLicenseOnBackground')
         ]
 
     imagePools = {}
     for (count, setName) in datasets:
+        dirT = listdir(path.join(folderPath, setName, "T"))
+        dirF = listdir(path.join(folderPath, setName, "F"))
+
+        if shuffle:
+            random.shuffle(dirT)
+            random.shuffle(dirF)
+
         imagePools[setName] = (
-            listdir(path.join(folderPath, setName, "T"))[:count//2 + count % 2],
-            listdir(path.join(folderPath, setName, "F"))[:count//2]
+            dirT[:count//2 + count % 2],
+            dirF[:count//2]
         )
 
     imgs = []
