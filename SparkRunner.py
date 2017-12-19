@@ -107,7 +107,7 @@ runName="Average"
 runMode=0
 runEpochs=1
 modelExt = ".hem"
-modelFilename = os.path.join('/home/user', *theThing.__name__.split('.')) + modelExt
+modelFilename = os.path.join('/home/user', *theThing.__name__.split('.')) + runName + modelExt
 print(modelFilename)
 
 batchsize = 35
@@ -174,7 +174,7 @@ def main():
             finalWeights = originalWeights + deltaWeights * (combinedCount / i)
 
         model.set_weights(finalWeights)
-        model.save(modelFilename+runName)
+        model.save(modelFilename)
 
 
 if __name__ == '__main__':
