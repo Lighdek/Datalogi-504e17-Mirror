@@ -139,7 +139,7 @@ def trainModel(x, modelTuple):
     return 1, np.array(model.get_weights())
 
 
-def main(mode=0):
+def main():
     #try:
     #    model = keras.models.load_model(modelFilename)
     #except OSError as e:
@@ -165,11 +165,11 @@ def main(mode=0):
 
         finalWeights = combinedWeights / combinedCount
 
-        if mode == 1:  # Calculate the change from the average, so we can scale it up
+        if runMode == 1:  # Calculate the change from the average, so we can scale it up
             originalWeights = np.array(model.get_weights())
             deltaWeights = finalWeights - originalWeights
             finalWeights = originalWeights + deltaWeights * combinedCount
-        elif mode == 2: # Some decay of the scaled average
+        elif runMode == 2: # Some decay of the scaled average
             originalWeights = np.array(model.get_weights())
             deltaWeights = finalWeights - originalWeights
             finalWeights = originalWeights + deltaWeights * (combinedCount / i)
@@ -179,4 +179,4 @@ def main(mode=0):
 
 
 if __name__ == '__main__':
-    main(runMode)
+    main()
