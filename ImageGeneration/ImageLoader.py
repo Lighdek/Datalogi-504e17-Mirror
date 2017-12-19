@@ -29,22 +29,19 @@ def loadImages(datasets: list=None, shuffle: bool=True, folderPath: str="/home/u
         for i in range(len(pool[0])):
             imgs.append(
                 np.asarray(
-                    Image.open(path.join(folderPath, setName, "T", pool[0][i]))
+                    Image.open(path.join(folderPath, setName, "T", pool[0][i])).resize((512, 512))
                 )
             )
             labels.append(True)
             if i < len(pool[1]):
                 imgs.append(
                     np.asarray(
-                        Image.open(path.join(folderPath, setName, "F", pool[1][i]))
+                        Image.open(path.join(folderPath, setName, "F", pool[1][i])).resize((512, 512))
                     )
                 )
                 labels.append(False)
 
-    if shuffle:
-        random.shuffle(imgs)
-
-    return imgs, labels
+    return np.array(imgs), np.array(labels)
 
 
 folderPathOld = "OurImages/512_512/"
