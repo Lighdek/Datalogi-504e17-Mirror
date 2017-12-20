@@ -45,8 +45,8 @@ Please note that these dependencies are only for non native libs
 </dl>
 
 
-#### Liste over nummerplader der skal findes:
-__Following is a list of licenceplate shitz__
+#### List of license plates that should be recognized:
+__Following is a list of licenceplate__
 
 <dl>
     <dt> 1. Normal (sort / hvid) </dt>
