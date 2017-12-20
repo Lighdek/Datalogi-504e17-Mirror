@@ -7,23 +7,26 @@ import numpy as np
 from os import path, listdir
 
 
-def loadImages(datasets: list=None, folderPath: str="OurImages/") -> tuple:
+def loadImages(datasets: list=None, shuffle: bool=True, folderPath: str="OurImages/") -> tuple:
     if datasets is None:
         datasets = [
-            (100, 'RealFrontBack'),
-            (100, 'GenLicenseOnBackground')
+            #(100, 'RealFrontBack'),
+            (50, 'GenLicenseOnBackground')
         ]
 
     imagePools = {}
     for (count, setName) in datasets:
+        dirT = listdir(path.join(folderPath, setName, "T"))
+        dirF = listdir(path.join(folderPath, setName, "F"))
+
+        if shuffle:
+            random.shuffle(dirT)
+            random.shuffle(dirF)
+
         imagePools[setName] = (
-            listdir(path.join(folderPath, setName, "T"))[:count//2 + count % 2],
-            listdir(path.join(folderPath, setName, "F"))[:count//2]
+            dirT[:count//2 + count % 2],
+            dirF[:count//2]
         )
-        #random.shuffle(imagePools[setName][0])
-        #random.shuffle(imagePools[setName][1])
-        #imagePools[setName] = (imagePools[setName][0][:count//2 + count % 2]
-        # ,imagePools[setName][1][:count//2])
 
     imgs = []
     labels = []
