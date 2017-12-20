@@ -1,52 +1,41 @@
-
 # Datalogi-504e17
 
-
-
-
-
-
-
-#### Dependencies
-__*Following is a list of dependencies to run this program*__  
-Please note that these dependencies are only for non native libs
-`pip install Keras tensorflow h5py numpy pygame opencv-python humanfriendly Pillow`
+## Dependencies
+The following command install all the required dependencies.
+`pip3 install Keras tensorflow h5py numpy Pillow pygame opencv-python pyspark humanfriendly`
 
 <dl>
-
-<dt>Pillow</dt>
-    <dd><em>pip install Pillow</em></dd>
-    <dd>Pillow eller PIL bliver brugt til at få filformatet "Images"
-<dt>numpy</dt>
-    <dd><em>pip install numpy</em></dd>
-    <dd>numby bliver brugt til at konveretere billeder til deres bestandele i pixels, dvs et 3 dim array </dd>
-<dt>pygame</dt>
-    <dd><em>pip install pygame</em></dd>
-    <dd>pygame, bliver brugt til at tegne billeder og er en nem måde at få events som keydown osv.</dd>
-<dt>humanfriendly</dt>
-    <dd><em>pip install humanfriendly</em></dd>
-    <dd>Bliver brugt i generatoren til at vise tid ordenligt.</dd>
-<dt>opencv-python</dt>
-    <dd><em>pip install opencv-python</em></dd>
-    <dd>Bliver brugt til at lave noget billedmanipulation.</dd>
 <dt>Keras</dt>
     <dd><em>pip install Keras </em></dd>
     <dd>Used for defining the model and used for training it.</dd>
+<dt>Tensorflow</dt>
+    <dd><em>pip install tensorflow</em></dd>
+    <dd>Used by Keras to do calculations, training and testing.</dd>
 <dt>h5py</dt>
     <dd><em>pip install Keras</em></dd>
     <dd>Used for saving the model.</dd>
+<dt>NumPy</dt>
+    <dd><em>pip install numpy</em></dd>
+    <dd>Used to work with arrays and matrices.</dd>
+<dt>Pillow</dt>
+    <dd><em>pip install Pillow</em></dd>
+    <dd>Pillow is used to load and manipulate images</dd>
+<dt>Pygame</dt>
+    <dd><em>pip install pygame</em></dd>
+    <dd>Used to display images on a window when labelling data.</dd>
+<dt>opencv-python</dt>
+    <dd><em>pip install opencv-python</em></dd>
+    <dd>Used for perspective and similar oparations on images.</dd>
 <dt>pyspark</dt>
     <dd><em>pip install pyspark</em></dd>
     <dd>Used as a python interface for spark.</dd>
-
-<dt>tensorflow</dt>
-    <dd><em>pip install tensorflow</em></dd>
-    <dd>Used by Keras to do calculations, training and testing.</dd>
+<dt>humanfriendly</dt>
+    <dd><em>pip install humanfriendly</em></dd>
+    <dd>Used in the generator to show more readable time.</dd>
 </dl>
 
 
-#### List of license plates that should be recognized:
-__Following is a list of licenceplate__
+## List of license plates that might be recognized:
 
 <dl>
     <dt> 1. Normal (black / white) </dt>
@@ -88,8 +77,4 @@ __Following is a list of licenceplate__
     <dt>7. small license plates</dt>
         <dd>
             <img src="https://upload.wikimedia.org/wikipedia/commons/1/18/Kfz-Kennzeichen_THW.jpg" alt="Kunne ikke finde et dansk eksampel">
-        </dd>
-    <dt>8. muhammed drawings</dt>
-        <dd>
-            <img src="https://www.denfri.dk/wp-content/uploads/2012/09/bombe-i-en-turban1-585x731.jpg" alt="For en god ordens skyld">
         </dd>
