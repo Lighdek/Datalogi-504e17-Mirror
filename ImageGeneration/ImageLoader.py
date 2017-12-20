@@ -7,11 +7,11 @@ import numpy as np
 from os import path, listdir
 
 
-def loadImages(datasets: list=None, shuffle: bool=True, folderPath: str="OurImages/") -> tuple:
+def loadImages(datasets: list=None, shuffle: bool=False, folderPath: str="OurImages/") -> tuple:
     if datasets is None:
         datasets = [
-            #(100, 'RealFrontBack'),
-            (50, 'GenLicenseOnBackground')
+            (100, 'RealFrontBack'),
+            (100, 'GenLicenseOnBackground')
         ]
 
     imagePools = {}
