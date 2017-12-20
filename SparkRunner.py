@@ -12,7 +12,7 @@ from KerasModel import StrideConvolutionalNetwork as theThing
 
 from pyspark import SparkContext, SparkConf
 
-modelExt = ".hem"
+modelExt = ".h5m"
 modelFilename = os.path.join(*theThing.__name__.split('.')) + modelExt
 print(modelFilename)
 
