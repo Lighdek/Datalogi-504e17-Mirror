@@ -19,11 +19,11 @@ def init():
         Dense(100, activation="tanh", kernel_regularizer=reg.l2(0.01)),
 
         Flatten(input_shape=(1, 1, None)),
-        Dense(2, activation='softmax')
+        Dense(1, activation='hard_sigmoid')
 
     ])
 
-    #optimizer = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9)
+
     optimizer = optimizers.adam(lr=1e-4, decay=1e-6)
     model.compile(loss='mean_squared_error', optimizer=optimizer, metrics=['accuracy', m.f1measure, m.f_half_measure, m.precision, m.recall])
 

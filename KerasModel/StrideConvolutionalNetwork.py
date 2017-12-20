@@ -8,9 +8,9 @@ from keras.layers import Conv2D, Dense, Flatten
 def init():
     model = Sequential([
         Conv2D(input_shape=(512, 512, 3),
-               filters=12, kernel_size=7, activation='relu', padding='same', strides=2, kernel_regularizer=reg.l2(0.01)),  # 256
+               filters=12, kernel_size=3, activation='relu', padding='same', strides=2, kernel_regularizer=reg.l2(0.01)),  # 256
 
-        Conv2D(filters=16, kernel_size=5, activation='relu', padding='same', strides=2, kernel_regularizer=reg.l2(0.01)),  # 128
+        Conv2D(filters=16, kernel_size=3, activation='relu', padding='same', strides=2, kernel_regularizer=reg.l2(0.01)),  # 128
 
         Conv2D(filters=16, kernel_size=3, activation='relu', padding='same', strides=2, kernel_regularizer=reg.l2(0.01)),  # 64
 
@@ -27,7 +27,7 @@ def init():
         Conv2D(filters=16, kernel_size=3, activation='relu', padding='same', strides=2, kernel_regularizer=reg.l2(0.01)),  # 1
 
         Flatten(),
-        Dense(2, activation='softmax')
+        Dense(1, activation='hard_sigmoid')
     ])
 
     optimizer = optimizers.adam(lr=1e-5, decay=1e-6)

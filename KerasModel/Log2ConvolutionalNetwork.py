@@ -36,7 +36,7 @@ def init():
         MaxPool2D(padding='same'),  # 1
 
         Flatten(input_shape=(1,1,None)),
-        Dense(2, activation='softmax')
+        Dense(1, activation='hard_sigmoid')
 
     ])
 
