@@ -5,7 +5,7 @@ from ImageGeneration import ImageLoader
 from keras import optimizers
 from KerasModel import LongStride as theThing
 
-modelExt = ".hem"
+modelExt = ".h5m"
 testExt = "1x"
 modelFilename = os.path.join(*theThing.__name__.split('.')) + testExt + modelExt
 print(modelFilename)
