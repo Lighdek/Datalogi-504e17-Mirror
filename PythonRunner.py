@@ -3,7 +3,7 @@ import os
 from ImageGeneration import ImageLoader
 from KerasModel import Log2 as theThing
 
-modelExt = ".hem"
+modelExt = ".h5m"
 testExt = "1x"
 modelFilename = os.path.join(*theThing.__name__.split('.')) + modelExt
 print(modelFilename)
