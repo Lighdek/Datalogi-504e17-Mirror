@@ -6,7 +6,7 @@ from KerasModel import Log2ConvolutionalNetwork as theThing
 
 import tensorflow as tf
 
-modelExt = ".hem"
+modelExt = ".h5m"
 modelFilename = os.path.join(*theThing.__name__.split('.')) + modelExt
 print(modelFilename)
 batchsize = 35

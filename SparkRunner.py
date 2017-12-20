@@ -4,6 +4,7 @@ import keras
 import numpy as np
 import os
 
+import time
 from PIL import Image
 from keras import optimizers
 from os import path, listdir
@@ -97,17 +98,19 @@ def loadImages(datasets: list=None, shuffle: bool=True, folderPath: str="/home/u
 
     return np.array(imgs), np.array(labels)
 
-    #mode   name,           epochs
-    #0      "Average")      1
-    #1      "Scale")        1
-    #2      "DecayingScale" 1
-    #0      "Average5Epoch" 4
+# mode   name,               epochs  parallel
+# 0      "Average"               1   48
+# 1      "Scale"                 1   48
+# 2      "DecayingDiv1Scale"     1   48
+# 0      "Average5Epoch"         5   48
+# 0      "8Average"              1   8
 
-
-runName="Average"
+runName="8Average"
 runMode=0
 runEpochs=1
-modelExt = ".hem"
+runIter=1
+
+modelExt = ".h5m"
 modelFilename = os.path.join('/home/user', *theThing.__name__.split('.')) + runName + modelExt
 print(modelFilename)
 
@@ -125,25 +128,17 @@ def trainModel(x, modelTuple):
     optimizer = optimizers.adam(lr=1e-4, decay=1e-6)
     model.compile(loss='mean_squared_error', optimizer=optimizer, metrics=['accuracy', f1measure, f_half_measure, precision, recall])
 
-    images, labels = loadImages([(70 ,"GenLicenseOnBackground")])
+    for i in range(runIter):
 
-    #callback = keras.callbacks.TensorBoard(log_dir='./logs', histogram_freq=0, batch_size=batchsize,
-    #                                       write_graph=True, write_grads=True, write_images=True, embeddings_freq=0,
-    #                                       embeddings_layer_names=None, embeddings_metadata=None, )
+        images, labels = loadImages([(70 ,"GenLicenseOnBackground")])
 
-    #callback = keras.callbacks.CSVLogger("/home/user/logs/"+runName, append=True)
-
-    model.fit(np.array(images), labels, batch_size=batchsize, epochs=runEpochs, verbose=1,
-              validation_split=0.0, shuffle=True)#, callbacks=[callback])
+        model.fit(np.array(images), labels, batch_size=batchsize, epochs=runEpochs, verbose=1,
+                  validation_split=0.0, shuffle=True)
 
     return 1, np.array(model.get_weights())
 
 
 def main():
-    #try:
-    #    model = keras.models.load_model(modelFilename)
-    #except OSError as e:
-    #   print(e)
     model = theThing.init()
 
     model.summary()
@@ -153,12 +148,17 @@ def main():
 
     assert (50//runEpochs)*runEpochs == 50
 
+    # Wait for all executors to be ready
+    taskDummy = sc.parallelize(range(2))
+    sleepDummy = taskDummy.map(lambda x: time.sleep(5))
+    sleepDummy.reduce(lambda x, y: print(x is None and y is None))
+
     writer = tf.summary.FileWriter("/home/user/logs/"+runName)
-    for i in range(50//runEpochs):
+    for i in range(200//runEpochs):
 
         sharedModel = sc.broadcast((model.get_config(), model.get_weights()))
 
-        taskDummy = sc.parallelize(range(48))
+        taskDummy = sc.parallelize(range(8), 8)
 
         changedWeights = taskDummy.map(lambda x: trainModel(x, sharedModel.value))
 
@@ -170,10 +170,10 @@ def main():
             originalWeights = np.array(model.get_weights())
             deltaWeights = finalWeights - originalWeights
             finalWeights = originalWeights + deltaWeights * combinedCount
-        elif runMode == 2: # Some decay of the scaled average
+        elif runMode == 2:  # Some decay of the scaled average
             originalWeights = np.array(model.get_weights())
             deltaWeights = finalWeights - originalWeights
-            finalWeights = originalWeights + deltaWeights * (combinedCount / i)
+            finalWeights = originalWeights + deltaWeights * (combinedCount / (i+1))
 
         model.set_weights(finalWeights)
         model.save(modelFilename)
@@ -184,7 +184,7 @@ def main():
         summaries = tf.Summary(value=[
             tf.Summary.Value(tag=model.metrics_names[x], simple_value=summary[x]) for x in range(len(model.metrics_names))
         ])
-        writer.add_summary(summaries)
+        writer.add_summary(summaries, i)
 
 
 if __name__ == '__main__':
