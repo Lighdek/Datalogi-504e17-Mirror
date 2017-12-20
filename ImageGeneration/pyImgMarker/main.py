@@ -3,8 +3,6 @@ from webbrowser import open
 from traceback import print_exc
 from os.path import join
 
-
-
 image_root = join("..", "Images", "car")
 settings_path = join("..","Images", "imgSettings.JSON")
 

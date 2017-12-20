@@ -9,7 +9,7 @@ from PIL import Image
 from keras import optimizers
 from os import path, listdir
 
-from KerasModel import Log2ConvolutionalNetwork as theThing
+from KerasModel import Log2 as theThing
 
 from pyspark import SparkContext, SparkConf
 import tensorflow as tf

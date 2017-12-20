@@ -1,4 +1,4 @@
-from Generator import Generator
+from . import Generator
 from webbrowser import open
 from humanfriendly import format_timespan
 import os, errno, platform, uuid, time, argparse

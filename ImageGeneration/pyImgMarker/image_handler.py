@@ -1,6 +1,7 @@
 from os import listdir
+from os.path import join
+
 import pygame
-from os.path import isfile, join
 import simplejson as json
 
 loaded_imgs = {}
@@ -35,7 +36,6 @@ def main_imgs(file_path, root_folder):
             if coordinates is False:
                 break
             loaded_imgs[filename] = coordinates
-
 
     write_to_file(file_path)
 

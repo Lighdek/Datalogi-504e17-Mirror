@@ -45,8 +45,9 @@ def quickBlur(image, weight = 0.15):
 
     return Image.fromarray(np.array(outputMatrix))
 
+
 #Very slow^tm
-def circleBlur(imageMatrix, blurRadius = 5, count = 1, colorbug = False):
+def circleBlur(imageMatrix, blurRadius = 5, count = 1):
 
     imageMatrix = loadImageMatrix(loadedImage=imageMatrix, Alpha=False)
     print(imageMatrix.shape)
@@ -56,19 +57,18 @@ def circleBlur(imageMatrix, blurRadius = 5, count = 1, colorbug = False):
     print(paddedMatrix.shape)
 
     count = random.randint(1, count)
-    blurRadius = blurRadius#random.randint(1, blurRadius)  #TODO: for each?
+    blurRadius = blurRadius
 
     blurMatrix = np.empty((blurRadius*2+1, blurRadius*2+1, 3))
     print(blurMatrix.shape)
 
     for (y, x, z), v in np.ndenumerate(blurMatrix):
-        dist = 1 / (1 + 2*blurRadius)**2  # currently just averaging
+        dist = 1 / (1 + 2*blurRadius)**2
         blurMatrix[y, x, z] = dist
 
     for i in range(0, count):
         print("i=%i/%i" % (i, count))
 
-        # TODO: only iterate over circle bounding box
         for y in range(0, imageMatrix.shape[0]):
             print("y=%i/%i" % (y, paddedMatrix.shape[0]))
 
@@ -83,12 +83,9 @@ def circleBlur(imageMatrix, blurRadius = 5, count = 1, colorbug = False):
                                 sum += paddedMatrix[y + yy, x + xx, z] * blurMatrix[yy, xx, z]
                             except IndexError as e:
                                 print(e)
-                                #print(sum)
 
                     output[y, x, z] = sum
-                #print(sum)
         paddedMatrix = output
-        #print_picture(loaded_image=Image.fromarray(np.array(output)))
     return Image.fromarray(np.array(output))
 
 
