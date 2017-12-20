@@ -21,10 +21,10 @@ Please note that these ONLY include shit you have to download on the side....
 <dt>pygame</dt>
     <dd><em>pip install pygame</em></dd>
     <dd>pygame, bliver brugt til at tegne billeder og er en nem måde at få events som keydown osv.</dd>
-<dt>pygame</dt>
+<dt>humanfriendly</dt>
     <dd><em>pip install humanfriendly</em></dd>
     <dd>Bliver brugt i generatoren til at vise tid ordenligt.</dd>
-<dt>pygame</dt>
+<dt>opencv-python</dt>
     <dd><em>pip install opencv-python</em></dd>
     <dd>Bliver brugt til at lave noget billedmanipulation.</dd>
 
