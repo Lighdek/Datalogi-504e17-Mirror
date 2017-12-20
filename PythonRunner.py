@@ -1,7 +1,7 @@
 import keras
 import os
 from ImageGeneration import ImageLoader
-from KerasModel import MatiasStrideConvolutionalNetwork as theThing
+from KerasModel import Log2 as theThing
 
 modelExt = ".hem"
 testExt = "1x"
@@ -14,15 +14,17 @@ if __name__ == '__main__':
 
     model.summary()
 
-    callback = keras.callbacks.TensorBoard(log_dir='./logs', histogram_freq=0, batch_size=batchsize,
+    TensorBoard = keras.callbacks.TensorBoard(log_dir='./logs', histogram_freq=0, batch_size=batchsize,
                                            write_graph=True, write_grads=True, write_images=True, embeddings_freq=0,
                                            embeddings_layer_names=None, embeddings_metadata=None, )
+
+    #EarlyStopping= keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=0, patience=1, verbose=1, mode='min')
 
     #images, labels = ImageLoader.loadImagesOld(count=5000) #ImageGenerator.Generator(200)
 
     images, labels = ImageLoader.loadImages(datasets = [(1100, 'RealFrontBack'), (8900, 'GenLicenseOnBackground')])
 
     model.fit(images, labels, batch_size=batchsize, epochs=20, verbose=1,
-              validation_split=0.10, shuffle=True, callbacks=[callback])
+              validation_split=0.10, shuffle=True, callbacks=[TensorBoard])
 
     model.save(os.path.join(*theThing.__name__.split('.')) + testExt + modelExt)
