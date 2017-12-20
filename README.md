@@ -9,11 +9,13 @@
 
 #### Dependencies
 __*Following is a list of dependencies to run this program*__  
-Please note that these ONLY include shit you have to download on the side....
+Please note that these dependencies are only for non native libs
+`pip install Keras tensorflow h5py numpy pygame opencv-python humanfriendly Pillow`
+
 <dl>
 
-<dt>pillow</dt>
-    <dd><em>pip install pillow</em></dd>
+<dt>Pillow</dt>
+    <dd><em>pip install Pillow</em></dd>
     <dd>Pillow eller PIL bliver brugt til at få filformatet "Images"
 <dt>numpy</dt>
     <dd><em>pip install numpy</em></dd>
@@ -27,10 +29,19 @@ Please note that these ONLY include shit you have to download on the side....
 <dt>opencv-python</dt>
     <dd><em>pip install opencv-python</em></dd>
     <dd>Bliver brugt til at lave noget billedmanipulation.</dd>
+<dt>Keras</dt>
+    <dd><em>pip install Keras </em></dd>
+    <dd>Used for defining the model and used for training it.</dd>
+<dt>h5py</dt>
+    <dd><em>pip install Keras</em></dd>
+    <dd>Used for saving the model.</dd>
+<dt>pyspark</dt>
+    <dd><em>pip install pyspark</em></dd>
+    <dd>Used as a python interface for spark.</dd>
 
-
-
-
+<dt>tensorflow</dt>
+    <dd><em>pip install tensorflow</em></dd>
+    <dd>Used by Keras to do calculations, training and testing.</dd>
 </dl>
 
 
@@ -82,5 +93,3 @@ __Following is a list of licenceplate shitz__
         <dd>
             <img src="https://www.denfri.dk/wp-content/uploads/2012/09/bombe-i-en-turban1-585x731.jpg" alt="For en god ordens skyld">
         </dd>
-
-pip install pillow && pip install numpy && pip install pygame
