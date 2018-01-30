@@ -109,7 +109,7 @@ def apply_filter(image, blur, rndom_noise, blur_amount_random, noise_amount_rand
     choice = random.random()
     if choice < blur:
         pass
-        #image = image.filter(ImageFilter.GaussianBlur(radius=(random.randint(blur_amount_random[0],blur_amount_random[1]))))
+        image = image.filter(ImageFilter.GaussianBlur(radius=(random.randint(blur_amount_random[0],blur_amount_random[1]))))
     elif choice < blur + rndom_noise:
         image = randomNoise(image, random.randint(noise_amount_random[0], noise_amount_random[1]))
 
